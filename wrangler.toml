@@ -1,0 +1,83 @@
+# ============================================================
+# Desafio+ — Cloudflare Workers Configuration (CORRIGIDO)
+# ============================================================
+#
+# PROBLEMA ORIGINAL: o wrangler tentava compilar o Express como
+# um Service Worker, mas Express usa módulos Node.js nativos.
+#
+# SOLUÇÃO APLICADA:
+#   1. "main" aponta para o WRAPPER (worker-adapter.js), não server.js
+#   2. nodejs_compat habilitado para suportar módulos Node.js
+#   3. Formato ES Module declarado explicitamente
+#
+# IMPORTANTE: Para desenvolvimento local, use "node server.js"
+# diretamente (veja README-DEV.md). O Wrangler é só para deploy.
+# ============================================================
+
+name = "desafio-plus-api"
+
+# ── Aponta para o adapter, NÃO para server.js diretamente ──
+main = "backend/worker-adapter.js"
+
+compatibility_date = "2024-09-23"
+
+# ── Habilita módulos Node.js (fs, crypto, http, etc.) ──────
+compatibility_flags = ["nodejs_compat"]
+
+# ── Formato ES Module (obrigatório para Workers modernos) ───
+# O worker-adapter.js usa "export default { fetch }" correto
+
+# ── Build ───────────────────────────────────────────────────
+[build]
+command = "cd backend && npm install"
+
+# ── D1 Database ─────────────────────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "desafio-plus-db"
+database_id = "YOUR_D1_DATABASE_ID"   # substitua após: wrangler d1 create desafio-plus-db
+
+# ── R2 Storage ──────────────────────────────────────────────
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "desafio-plus-media"
+preview_bucket_name = "desafio-plus-media-preview"
+
+# ── KV (cache / sessões) ────────────────────────────────────
+[[kv_namespaces]]
+binding = "CACHE"
+id = "YOUR_KV_NAMESPACE_ID"           # substitua após: wrangler kv:namespace create CACHE
+preview_id = "YOUR_KV_PREVIEW_ID"
+
+# ── Variáveis de ambiente (produção) ────────────────────────
+[vars]
+NODE_ENV = "production"
+APP_NAME = "Desafio+"
+FRONTEND_URL = "https://desafio-plus.pages.dev"
+
+# ── Secrets (configure via: wrangler secret put NOME_DO_SECRET)
+# JWT_SECRET
+# JWT_REFRESH_SECRET
+# GOOGLE_CLIENT_ID
+# GOOGLE_CLIENT_SECRET
+# OPENAI_API_KEY
+# SMTP_HOST
+# SMTP_USER
+# SMTP_PASS
+# R2_ACCESS_KEY_ID
+# R2_SECRET_ACCESS_KEY
+# R2_ENDPOINT
+
+# ── Rotas (só necessário se tiver domínio próprio) ──────────
+# [[routes]]
+# pattern = "api.desafio-plus.com/*"
+# zone_name = "desafio-plus.com"
+
+# ── Ambientes ───────────────────────────────────────────────
+[env.staging]
+name = "desafio-plus-api-staging"
+vars = { NODE_ENV = "staging", FRONTEND_URL = "https://staging.desafio-plus.pages.dev" }
+
+[env.development]
+name = "desafio-plus-api-dev"
+vars = { NODE_ENV = "development", FRONTEND_URL = "http://localhost:3000" }

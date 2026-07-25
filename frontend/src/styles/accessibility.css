@@ -1,0 +1,138 @@
+/* ============================================================
+   Desafio+ — accessibility.css  (v2 — cirúrgico, sem conflitos)
+   
+   REGRA: Este arquivo NÃO redefine nenhuma classe do projeto.
+   Ele apenas COMPLEMENTA com:
+     • Tamanho mínimo de toque (WCAG 2.5.5)
+     • Foco visível (WCAG 2.4.7)
+     • Fonte base ligeiramente maior
+     • Sem animações para quem prefere (prefers-reduced-motion)
+   
+   Classes do projeto que NÃO são tocadas aqui:
+     .btn, .btn-primary, .btn-google, .btn-secondary
+     .auth-card, .auth-title, .auth-subtitle
+     .alert, .alert-error, .alert-success
+     .form-group, .form-label, .form-input
+     .card, .modal, .navbar, .spinner
+   ============================================================ */
+
+/* ── 1. Fonte base: 17px (era 16px implícito do browser)
+        Só afeta o html — o body herda, mas todas as classes
+        do projeto que usam rem já ficam proporcionalmente maiores.
+        NÃO muda nenhuma classe específica. ─────────────────── */
+html {
+  font-size: 17px;
+}
+
+/* ── 2. Área de toque mínima WCAG 2.5.5 (44×44px)
+        Usa min-height/min-width para NÃO sobrescrever padding,
+        display, flex, gap, border-radius ou qualquer outra
+        propriedade visual dos botões do projeto. ─────────────── */
+button:not([data-no-a11y]),
+[role="button"]:not([data-no-a11y]),
+input[type="submit"],
+input[type="button"],
+input[type="reset"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* ── 3. Inputs: altura mínima de 48px
+        Só adiciona min-height — NÃO muda padding, border,
+        background, color ou font-size do .form-input do projeto. ── */
+input[type="text"]:not([data-no-a11y]),
+input[type="email"]:not([data-no-a11y]),
+input[type="password"]:not([data-no-a11y]),
+input[type="search"]:not([data-no-a11y]),
+input[type="tel"]:not([data-no-a11y]),
+input[type="url"]:not([data-no-a11y]),
+input[type="number"]:not([data-no-a11y]),
+textarea:not([data-no-a11y]),
+select:not([data-no-a11y]) {
+  min-height: 48px;
+}
+
+/* ── 4. Foco visível (WCAG 2.4.7)
+        O projeto usa outline:none em .form-input:focus e
+        substitui por box-shadow. Aqui adicionamos :focus-visible
+        que só dispara com teclado — não interfere com mouse. ─── */
+:focus-visible {
+  outline: 3px solid #a855f7 !important;
+  outline-offset: 3px !important;
+}
+
+/* Remove outline feio do browser apenas quando :focus-visible
+   está disponível (browsers modernos) */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── 5. Skip link (acessibilidade para teclado)
+        Elemento oculto que aparece ao pressionar Tab.
+        Não conflita com nada — classe exclusiva. ─────────────── */
+.a11y-skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  background: #7c3aed;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  z-index: 9999;
+  border-radius: 0 0 8px 0;
+  transition: top 0.2s;
+  text-decoration: none;
+}
+.a11y-skip-link:focus {
+  top: 0;
+}
+
+/* ── 6. Sem animações para quem prefere (prefers-reduced-motion)
+        Respeita preferência do sistema operacional. ─────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── 7. Resolução 1024×768 — ajustes mínimos ─────────────────── */
+@media (max-width: 1024px) and (min-width: 801px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* ── 8. Resolução 800×600 — ajustes mínimos ─────────────────── */
+@media (max-width: 800px) {
+  html {
+    font-size: 16px;
+  }
+
+  /* Botões e inputs ainda maiores em telas pequenas */
+  button:not([data-no-a11y]),
+  [role="button"]:not([data-no-a11y]),
+  input[type="submit"],
+  input[type="button"] {
+    min-height: 52px;
+  }
+
+  input[type="text"]:not([data-no-a11y]),
+  input[type="email"]:not([data-no-a11y]),
+  input[type="password"]:not([data-no-a11y]),
+  textarea:not([data-no-a11y]) {
+    min-height: 52px;
+  }
+}
+
+/* ── 9. Telas muito pequenas (< 480px) ──────────────────────── */
+@media (max-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+}

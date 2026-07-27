@@ -86,12 +86,17 @@ async function notifyAllUsersNewMember(newUser) {
 
 async function register(req, res) {
   try {
-    const { email, password, username, display_name } = req.body;
+    let { email, password, username, display_name } = req.body;
 
     // Validação
     if (!email || !password || !username || !display_name) {
       return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
     }
+
+    // Normaliza (evita e-mail/username salvos com maiúsculas divergindo do login)
+    email = String(email).trim().toLowerCase();
+    username = String(username).trim().toLowerCase();
+    display_name = String(display_name).trim();
     if (password.length < 8) {
       return res.status(400).json({ error: 'Senha deve ter pelo menos 8 caracteres' });
     }
@@ -134,12 +139,13 @@ async function register(req, res) {
 
 async function login(req, res) {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ error: 'E-mail e senha são obrigatórios' });
     }
 
+    email = String(email).trim().toLowerCase();
     const user = await userModel.findByEmail(email);
     if (!user || !user.password_hash) {
       return res.status(401).json({ error: 'Credenciais inválidas' });
@@ -185,7 +191,8 @@ async function googleAuth(req, res) {
       audience: (globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
-    const { sub: googleId, email, name, picture } = payload;
+    const { sub: googleId, name, picture } = payload;
+    const email = String(payload.email).trim().toLowerCase();
 
     let isNew = false;
     let user = await userModel.findByGoogleId(googleId);

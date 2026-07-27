@@ -60,6 +60,7 @@ const Login = () => {
       setGError('Falha ao carregar Google. Verifique sua conexão.');
     };
     document.head.appendChild(script);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (e) => {

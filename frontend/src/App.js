@@ -92,7 +92,7 @@ const AppRoutes = () => {
           <PrivateRoute><Chat /></PrivateRoute>
         } />
 
-        <Route path="/chat/:userId" element={
+        <Route path="/chat/:username" element={
           <PrivateRoute><Chat /></PrivateRoute>
         } />
 

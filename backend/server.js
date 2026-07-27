@@ -12,13 +12,10 @@
 // ── Carrega .env ──────────────────────────────────────────────────────────────
 require('dotenv').config();
 
-// ── Auto-gera JWT_SECRET se não estiver no .env ───────────────────────────────
+// ── JWT_SECRET: não gera automaticamente — use .env (local) ou wrangler secret (Workers) ─
 if (!process.env.JWT_SECRET) {
-  const crypto = require('crypto');
-  process.env.JWT_SECRET = crypto.randomBytes(64).toString('hex');
-  console.log('⚠️  JWT_SECRET não encontrado no .env — gerado automaticamente para esta sessão.');
-  console.log('   Para manter o mesmo secret entre reinicializações, adicione ao .env:');
-  console.log(`   JWT_SECRET=${process.env.JWT_SECRET}\n`);
+  console.log('⚠️  JWT_SECRET não encontrado. Usando fallback para desenvolvimento.');
+  console.log('   Para produção, configure via .env (local) ou wrangler secret put JWT_SECRET (Workers).');
 }
 
 // ── Inicializa banco de dados (auto-migrate) ──────────────────────────────────
@@ -83,6 +80,14 @@ if (generalLimiter) {
   app.use('/api/', generalLimiter);
 }
 
+// ── Injeta D1 binding no req (Cloudflare Workers) ──────────────────────────
+app.use((req, res, next) => {
+  if (globalThis.__CF_ENV__ && globalThis.__CF_ENV__.DB) {
+    req.d1 = globalThis.__CF_ENV__.DB;
+  }
+  next();
+});
+
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.json({
@@ -103,12 +108,6 @@ function loadRoute(routePath) {
     const router = express.Router();
     router.all('*', (req, res) => res.status(501).json({ error: 'Rota não implementada ainda' }));
     return router;
-    // Adicionar junto com as outras rotas no server.js
-    const presenceRoutes    = require('./routes/presence');
-    const suggestionsRoutes = require('./routes/suggestions');
-    app.use('/api/presence',    presenceRoutes);
-    app.use('/api/suggestions', suggestionsRoutes);
-
   }
 }
 
@@ -128,9 +127,19 @@ app.use('/api/blocks', loadRoute('./routes/blockRoutes'));
   ['/api/search',        './routes/search'],
   ['/api/upload',        './routes/upload'],
   ['/api/reports',       './routes/reports'],
+  ['/api/presence',      './routes/presence'],
+  ['/api/suggestions',   './routes/suggestions'],
 ].forEach(([prefix, file]) => {
   app.use(prefix, loadRoute(file));
 });
+
+// ── Arquivos estáticos (uploads) — só local ──────────────────────────────────
+try {
+  const staticPath = require('path');
+  app.use('/uploads', express.static(staticPath.join(__dirname, 'uploads')));
+} catch (e) {
+  // Workers — filesystem não disponível
+}
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((req, res) => {
@@ -146,16 +155,15 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ── Start ─────────────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 8787;
-app.listen(PORT, () => {
-  console.log(`\n🚀 Desafio+ API rodando em http://localhost:${PORT}`);
-  console.log(`   Ambiente : ${process.env.NODE_ENV || 'development'}`);
-  console.log(`   CORS     : ${isDev ? 'permissivo (localhost liberado)' : 'restrito'}`);
-  console.log(`   Banco    : desafio-plus.db (SQLite local)\n`);
-});
+// ── Start (só local — no Workers, o adapter cuida disso) ───────────────────
+if (!globalThis.__CF_ENV__) {
+  const PORT = process.env.PORT || 8787;
+  app.listen(PORT, () => {
+    console.log(`\n🚀 Desafio+ API rodando em http://localhost:${PORT}`);
+    console.log(`   Ambiente : ${process.env.NODE_ENV || 'development'}`);
+    console.log(`   CORS     : ${isDev ? 'permissivo (localhost liberado)' : 'restrito'}`);
+    console.log(`   Banco    : desafio-plus.db (SQLite local)\n`);
+  });
+}
 
 module.exports = app;
-
-const path = require('path');
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

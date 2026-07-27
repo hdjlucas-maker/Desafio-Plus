@@ -28,8 +28,8 @@ export default function Feed() {
       let media_urls = [];
       let media_type = 'none';
       if (mediaFile) {
-        const url = await uploadAPI.uploadToR2(mediaFile, 'posts');
-        media_urls = [url];
+        const { data: uploadData } = await uploadAPI.uploadToR2(mediaFile, 'posts');
+        media_urls = [uploadData.url];
         media_type = mediaFile.type.startsWith('video') ? 'video' : 'image';
       }
       const { data } = await postsAPI.create({ content: postText, category, media_urls, media_type });

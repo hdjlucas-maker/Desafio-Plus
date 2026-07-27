@@ -1,8 +1,11 @@
 /**
  * Desafio+ — Chat Page
+ * Desktop: sidebar 280px + messages
+ * Mobile: full-screen conversation list → tap to open messages → back button
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import { chatAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
@@ -10,6 +13,7 @@ import { ptBR } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 
 export default function Chat() {
+  const { username } = useParams();
   const { user } = useAuth();
   const [conversations, setConversations] = useState([]);
   const [activeConv, setActiveConv] = useState(null);
@@ -20,6 +24,23 @@ export default function Chat() {
 
   useEffect(() => { loadConversations(); }, []);
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+
+  // Auto-open conversation when URL has a username
+  useEffect(() => {
+    if (username) {
+      (async () => {
+        try {
+          const { data } = await chatAPI.openConversation(username);
+          setActiveConv(data);
+          const msgs = await chatAPI.getMessages(data.id);
+          setMessages(msgs.data);
+          setConversations(prev => prev.map(c => c.id === data.id ? { ...c, unread_count: 0 } : c));
+        } catch {
+          toast.error('Erro ao abrir conversa');
+        }
+      })();
+    }
+  }, [username]);
 
   const loadConversations = async () => {
     try {
@@ -37,6 +58,11 @@ export default function Chat() {
     } catch {}
   };
 
+  const goBack = () => {
+    setActiveConv(null);
+    setMessages([]);
+  };
+
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!text.trim() || !activeConv) return;
@@ -50,12 +76,9 @@ export default function Chat() {
   };
 
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - var(--navbar-h))', maxWidth: 900, margin: '0 auto' }}>
+    <div className="chat-layout">
       {/* Conversations List */}
-      <div style={{
-        width: 280, borderRight: '1px solid var(--border)',
-        overflowY: 'auto', flexShrink: 0,
-      }}>
+      <div className={`chat-sidebar ${activeConv ? 'hidden-mobile' : ''}`}>
         <div style={{ padding: '1rem', borderBottom: '1px solid var(--border)' }}>
           <h2 style={{ fontSize: '1.1rem' }}>💬 Mensagens</h2>
         </div>
@@ -93,10 +116,17 @@ export default function Chat() {
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div className={`chat-main ${!activeConv ? 'hidden-mobile' : ''}`}>
         {activeConv ? (
           <>
+            {/* Header with back button on mobile */}
             <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <button onClick={goBack} className="btn-chat-back" style={{
+                display: 'none', background: 'none', border: 'none', color: 'var(--text-primary)',
+                fontSize: '1.2rem', cursor: 'pointer', padding: '0.25rem',
+              }}>
+                ←
+              </button>
               <div className="avatar avatar-sm" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-hover)', fontSize: '1rem' }}>
                 {activeConv.peer_avatar ? <img src={activeConv.peer_avatar} alt="" className="avatar avatar-sm" /> : '👤'}
               </div>
@@ -129,7 +159,7 @@ export default function Chat() {
             </form>
           </>
         ) : (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+          <div className="chat-empty">
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>💬</div>
               <p>Selecione uma conversa</p>

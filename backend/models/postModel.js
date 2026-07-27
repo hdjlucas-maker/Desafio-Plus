@@ -18,7 +18,9 @@ async function findById(id, viewerId = null, d1 = null) {
      WHERE p.id = ? AND p.is_deleted = 0`,
     [id], d1
   );
-  if (!post || !viewerId) return post;
+  if (!post) return post;
+  post.media_urls = JSON.parse(post.media_urls || '[]');
+  if (!viewerId) return post;
   post.liked = !!(await queryOne('SELECT 1 FROM likes WHERE user_id = ? AND post_id = ?', [viewerId, id], d1));
   return post;
 }

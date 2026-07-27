@@ -9,10 +9,14 @@ const fs      = require('fs');
 const { requireAuth } = require('../middleware/auth');
 const { uploadLimiter } = require('../middleware/rateLimiter');
 
-// Garante que a pasta uploads/ existe
-const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+// Garante que a pasta uploads/ existe (só local — Workers não tem filesystem)
+try {
+  const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+} catch (e) {
+  // Workers — filesystem não disponível
 }
 
 // Tenta carregar multer (opcional — não crasha se não instalado)

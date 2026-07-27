@@ -24,7 +24,7 @@ const api = axios.create({
 
 // ── Interceptor: injeta token JWT em todas as requisições ──────────────────
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('access_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -34,7 +34,8 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err?.response?.status === 401 && err?.response?.data?.code === 'TOKEN_EXPIRED') {
-      localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
       window.location.href = '/login';
     }
     return Promise.reject(err);
@@ -61,8 +62,8 @@ export const postsAPI = {
 };
 
 export const feedAPI = {
-  getFeed:    (page = 1)        => api.get(`/feed?page=${page}`),
-  getExplore: (page = 1)        => api.get(`/feed/explore?page=${page}`),
+  getFeed:    (params = {})      => api.get(`/feed`, { params }),
+  getExplore: (params = {})      => api.get(`/feed/explore`, { params }),
 };
 
 export const notificationsAPI = {
@@ -73,16 +74,19 @@ export const notificationsAPI = {
 };
 
 export const challengesAPI = {
-  getAll:      ()               => api.get('/challenges'),
-  getDaily:    ()               => api.get('/challenges/daily'),
-  complete:    (id, data)       => api.post(`/challenges/${id}/complete`, data),
-  generateAI:  ()               => api.post('/challenges/generate'),
+  getAll:      (params)          => api.get('/challenges', { params }),
+  getDaily:    (params)          => api.get('/challenges/daily', { params }),
+  complete:    (data)            => api.post('/challenges/complete', data),
+  generateAI:  (data)            => api.post('/challenges/ai-generate', data),
+  getMyHistory:()                => api.get('/challenges/my-history'),
+  getTip:      (id)              => api.get(`/challenges/${id}/tip`),
 };
 
 export const chatAPI = {
-  getConversations: ()          => api.get('/chat/conversations'),
-  getMessages:      (userId)    => api.get(`/chat/messages/${userId}`),
-  sendMessage:      (userId, content) => api.post(`/chat/messages/${userId}`, { content }),
+  getConversations: ()              => api.get('/chat'),
+  openConversation: (username)      => api.get(`/chat/with/${username}`),
+  getMessages:      (conversationId, params) => api.get(`/chat/${conversationId}/messages`, { params }),
+  sendMessage:      (conversationId, body)   => api.post(`/chat/${conversationId}/messages`, body),
 };
 
 export const uploadAPI = {

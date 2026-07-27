@@ -1,5 +1,7 @@
 /**
  * Desafio+ — Navbar Component
+ * Desktop: top bar com logo, busca, nav links, avatar menu
+ * Mobile (<=768px): top bar simplificado + bottom nav fixo
  */
 
 import React, { useState } from 'react';
@@ -32,97 +34,88 @@ export default function Navbar() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-      height: 'var(--navbar-h)',
-      background: 'rgba(13,13,26,0.95)',
-      backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid var(--border)',
-      display: 'flex', alignItems: 'center',
-      padding: '0 1rem', gap: '1rem',
-    }}>
-      {/* Logo */}
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-        <span style={{ fontSize: '1.5rem' }}>🎯</span>
-        <span className="gradient-text" style={{ fontFamily: 'Poppins', fontWeight: 800, fontSize: '1.1rem' }}>
-          Desafio+
-        </span>
-      </Link>
+    <>
+      {/* ── Top Bar (sempre visível) ── */}
+      <nav className="navbar-top">
+        <Link to="/" className="navbar-logo">
+          <span style={{ fontSize: '1.5rem' }}>🎯</span>
+          <span className="gradient-text" style={{ fontFamily: 'Poppins', fontWeight: 800, fontSize: '1.1rem' }}>
+            Desafio+
+          </span>
+        </Link>
 
-      {/* Search */}
-      {user && (
-        <form onSubmit={handleSearch} style={{ flex: 1, maxWidth: 320 }}>
-          <input
-            className="input"
-            value={searchQ}
-            onChange={e => setSearchQ(e.target.value)}
-            placeholder="🔍 Buscar usuários, posts..."
-            style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
-          />
-        </form>
-      )}
+        {user && (
+          <form onSubmit={handleSearch} className="navbar-search">
+            <input
+              className="input"
+              value={searchQ}
+              onChange={e => setSearchQ(e.target.value)}
+              placeholder="🔍 Buscar..."
+              style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+            />
+          </form>
+        )}
 
-      {/* Nav links */}
-      {user ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginLeft: 'auto' }}>
-          <NavBtn to="/feed" icon="🏠" label="Feed" active={isActive('/feed')} />
-          <NavBtn to="/explore" icon="🔭" label="Explorar" active={isActive('/explore')} />
-          <NavBtn to="/challenges" icon="🎯" label="Desafios" active={isActive('/challenges')} />
-          <NavBtn to="/games" icon="🎮" label="Jogos" active={isActive('/games')} />
-          <NavBtn to="/chat" icon="💬" label="Chat" active={isActive('/chat')} />
-          <NavBtn to="/notifications" icon="🔔" label="Notificações" active={isActive('/notifications')} badge={unreadCount} />
+        {user ? (
+          <div className="navbar-right">
+            {/* Desktop nav links — hidden on mobile */}
+            <div className="navbar-links-desktop">
+              <NavBtn to="/feed" icon="🏠" label="Feed" active={isActive('/feed')} />
+              <NavBtn to="/explore" icon="🔭" label="Explorar" active={isActive('/explore')} />
+              <NavBtn to="/challenges" icon="🎯" label="Desafios" active={isActive('/challenges')} />
+              <NavBtn to="/games" icon="🎮" label="Jogos" active={isActive('/games')} />
+              <NavBtn to="/chat" icon="💬" label="Chat" active={isActive('/chat')} />
+              <NavBtn to="/notifications" icon="🔔" label="Notif." active={isActive('/notifications')} badge={unreadCount} />
+            </div>
 
-          {/* Avatar menu */}
-          <div style={{ position: 'relative' }}>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '0.5rem',
-                background: 'var(--bg-hover)', border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-full)', padding: '0.3rem 0.75rem',
-                color: 'var(--text-primary)', cursor: 'pointer',
-              }}
-            >
-              {user.avatar_url
-                ? <img src={user.avatar_url} alt="" className="avatar avatar-sm" />
-                : <span style={{ fontSize: '1.2rem' }}>👤</span>
-              }
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, display: 'none' }}
-                className="hide-mobile">{user.username}</span>
-            </button>
+            {/* Avatar menu — always visible */}
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="navbar-avatar-btn"
+              >
+                {user.avatar_url
+                  ? <img src={user.avatar_url} alt="" className="avatar avatar-sm" />
+                  : <span style={{ fontSize: '1.2rem' }}>👤</span>
+                }
+                <span className="hide-mobile" style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                  {user.username}
+                </span>
+              </button>
 
-            {menuOpen && (
-              <div style={{
-                position: 'absolute', right: 0, top: '110%',
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-lg)', padding: '0.5rem',
-                minWidth: 180, boxShadow: 'var(--shadow-lg)', zIndex: 200,
-              }}>
-                <MenuItem to={`/profile/${user.username}`} icon="👤" label="Meu Perfil" onClick={() => setMenuOpen(false)} />
-                <MenuItem to="/settings" icon="⚙️" label="Configurações" onClick={() => setMenuOpen(false)} />
-                <div style={{ height: 1, background: 'var(--border)', margin: '0.25rem 0' }} />
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem',
-                    padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)',
-                    color: '#ef4444', fontSize: '0.9rem', cursor: 'pointer',
-                    background: 'none', border: 'none',
-                  }}
-                >
-                  🚪 Sair
-                </button>
-              </div>
-            )}
+              {menuOpen && (
+                <div className="navbar-dropdown">
+                  <MenuItem to={`/profile/${user.username}`} icon="👤" label="Meu Perfil" onClick={() => setMenuOpen(false)} />
+                  <MenuItem to="/settings" icon="⚙️" label="Configurações" onClick={() => setMenuOpen(false)} />
+                  <MenuItem to="/discover" icon="🌍" label="Descobrir Pessoas" onClick={() => setMenuOpen(false)} />
+                  <div style={{ height: 1, background: 'var(--border)', margin: '0.25rem 0' }} />
+                  <button onClick={handleLogout} className="navbar-logout-btn">
+                    🚪 Sair
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
-          <Link to="/login" className="btn btn-secondary" style={{ padding: '0.5rem 1rem' }}>Entrar</Link>
-          <Link to="/register" className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>Cadastrar</Link>
-        </div>
+        ) : (
+          <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
+            <Link to="/login" className="btn btn-secondary" style={{ padding: '0.5rem 1rem' }}>Entrar</Link>
+            <Link to="/register" className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>Cadastrar</Link>
+          </div>
+        )}
+      </nav>
+
+      {/* ── Bottom Nav (mobile only, user logged in) ── */}
+      {user && (
+        <nav className="navbar-bottom">
+          <BottomNavBtn to="/feed" icon="🏠" active={isActive('/feed')} />
+          <BottomNavBtn to="/explore" icon="🔍" active={isActive('/explore')} />
+          <BottomNavBtn to="/challenges" icon="🎯" active={isActive('/challenges')} />
+          <BottomNavBtn to="/games" icon="🎮" active={isActive('/games')} />
+          <BottomNavBtn to="/chat" icon="💬" active={isActive('/chat')} />
+          <BottomNavBtn to="/notifications" icon="🔔" active={isActive('/notifications')} badge={unreadCount} />
+        </nav>
       )}
-    </nav>
+    </>
   );
 }
 
@@ -139,32 +132,29 @@ function NavBtn({ to, icon, label, active, badge }) {
       }}>
         {icon}
         {badge > 0 && (
-          <span style={{
-            position: 'absolute', top: 2, right: 2,
-            background: '#ef4444', color: 'white',
-            borderRadius: '50%', width: 16, height: 16,
-            fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700,
-          }}>
-            {badge > 9 ? '9+' : badge}
-          </span>
+          <span className="navbar-badge">{badge > 9 ? '9+' : badge}</span>
         )}
       </button>
     </Link>
   );
 }
 
+function BottomNavBtn({ to, icon, active, badge }) {
+  return (
+    <Link to={to} className="bottom-nav-item" style={{ color: active ? 'var(--purple-light)' : 'var(--text-muted)' }}>
+      <span style={{ fontSize: '1.3rem', position: 'relative' }}>
+        {icon}
+        {badge > 0 && (
+          <span className="navbar-badge" style={{ top: -4, right: -8 }}>{badge > 9 ? '9+' : badge}</span>
+        )}
+      </span>
+    </Link>
+  );
+}
+
 function MenuItem({ to, icon, label, onClick }) {
   return (
-    <Link to={to} onClick={onClick} style={{
-      display: 'flex', alignItems: 'center', gap: '0.5rem',
-      padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)',
-      color: 'var(--text-primary)', fontSize: '0.9rem',
-      transition: 'var(--transition)',
-    }}
-    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-    onMouseLeave={e => e.currentTarget.style.background = 'none'}
-    >
+    <Link to={to} onClick={onClick} className="navbar-menu-item">
       {icon} {label}
     </Link>
   );

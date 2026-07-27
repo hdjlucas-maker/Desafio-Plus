@@ -10,6 +10,14 @@ import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 
+const API_BASE = (process.env.REACT_APP_API_URL || 'http://localhost:8787/api').replace(/\/api\/?$/, '');
+
+function resolveMediaUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
+  return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
 const CATEGORY_LABELS = {
   geral: '🌐 Geral', solo: '🧘 Solo', a_dois: '💑 A Dois', turma: '🎉 Turma',
 };
@@ -119,8 +127,8 @@ export default function PostCard({ post, onUpdate, onDelete }) {
       {post.media_urls?.length > 0 && (
         <div style={{ marginBottom: '0.75rem', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
           {post.media_type === 'video'
-            ? <video src={post.media_urls[0]} controls style={{ width: '100%', maxHeight: 400, objectFit: 'cover' }} />
-            : <img src={post.media_urls[0]} alt="" style={{ width: '100%', maxHeight: 400, objectFit: 'cover' }} />
+            ? <video src={resolveMediaUrl(post.media_urls[0])} controls style={{ width: '100%', maxHeight: 400, objectFit: 'cover' }} />
+            : <img src={resolveMediaUrl(post.media_urls[0])} alt="" style={{ width: '100%', maxHeight: 400, objectFit: 'cover' }} />
           }
         </div>
       )}

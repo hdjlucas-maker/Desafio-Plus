@@ -239,7 +239,7 @@ const Discover = () => {
     }
   };
 
-  const handleChat = (user) => navigate(`/chat/${user.id}`);
+  const handleChat = (user) => navigate(`/chat/${user.username}`);
 
   const handleInvite = (user) => {
     alert(`Convite enviado para @${user.username}! 🎮\n\n(Funcionalidade de convite em desenvolvimento)`);

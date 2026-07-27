@@ -11,7 +11,7 @@
  *   forgotPassword, resetPassword, me
  */
 
-require('dotenv').config();
+try { require('dotenv').config(); } catch (e) { /* Workers — dotenv não disponível */ }
 
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
@@ -23,15 +23,21 @@ const {
   verifyRefreshToken,
 } = require('../middleware/auth');
 
-// Google OAuth — opcional: só funciona se GOOGLE_CLIENT_ID estiver no .env
-let googleClient = null;
-try {
-  const { OAuth2Client } = require('google-auth-library');
-  if (process.env.GOOGLE_CLIENT_ID) {
-    googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+// Google OAuth — opcional: lazy init para respeitar globalThis.__CF_ENV__ (Workers)
+let _googleClient = null;
+let _lastGcid = null;
+function getGoogleClient() {
+  const gCid = (globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID;
+  if (!gCid) return null;
+  if (_googleClient && _lastGcid === gCid) return _googleClient;
+  try {
+    const { OAuth2Client } = require('google-auth-library');
+    _googleClient = new OAuth2Client(gCid);
+    _lastGcid = gCid;
+    return _googleClient;
+  } catch {
+    return null;
   }
-} catch {
-  // google-auth-library não instalado — Google OAuth desabilitado
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -166,16 +172,17 @@ async function login(req, res) {
 
 async function googleAuth(req, res) {
   try {
-    if (!googleClient) {
+    const gc = getGoogleClient();
+    if (!gc) {
       return res.status(501).json({ error: 'Login com Google não configurado neste servidor.' });
     }
 
     const { id_token } = req.body;
     if (!id_token) return res.status(400).json({ error: 'Token Google necessário' });
 
-    const ticket = await googleClient.verifyIdToken({
+    const ticket = await gc.verifyIdToken({
       idToken: id_token,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: (globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
     const { sub: googleId, email, name, picture } = payload;

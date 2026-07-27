@@ -13,7 +13,7 @@ async function getDailyChallenges(req, res) {
     const { mode } = req.query;
     const d1 = req.d1 || null;
     const filter = mode ? 'AND mode = ?' : '';
-    const params = mode ? [1, mode] : [1];
+    const params = mode ? [mode] : [];
     const challenges = await query(
       `SELECT * FROM challenges WHERE is_daily = 1 AND is_active = 1 ${filter} ORDER BY RANDOM() LIMIT 5`,
       params, d1

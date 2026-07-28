@@ -42,7 +42,7 @@ function toHono(handler) {
       const req = {
         get user() { return c.get('user') || null; },
         set user(v) { c.set('user', v); },
-        get d1() { return c.get('d1') || null; },
+        get d1() { return c.get('d1') || c.env.DB || null; },
         set d1(v) { c.set('d1', v); },
         get params() { return c.req.param(); },
         get headers() { return Object.fromEntries(c.req.raw.headers); },

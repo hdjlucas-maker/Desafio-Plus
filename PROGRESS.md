@@ -133,20 +133,19 @@
 ### Médios
 4. ~~**Google OAuth não configurado**~~ **REMOVIDO** — login com Google removido do frontend e backend. Restam apenas e-mail/senha.
 5. **Password reset sem envio de email**: Token logado no console. `nodemailer` instalado mas não usado.
-6. **PrivacySettings usa fetch() em vez de axios** — usa `access_token` do localStorage (consistente com AuthContext).
+6. ~~**PrivacySettings usa fetch() em vez de axios**~~ **CORRIGIDO** — migrado para `usersAPI` com axios.
 7. ~~**Two localStorage keys**: `api.js` lê `token`, AuthContext usa `access_token`~~ **CORRIGIDO** — `api.js` agora usa `access_token`.
 8. **R2 storage configurado mas NÃO habilitado na conta Cloudflare** — precisa habilitar R2 no Dashboard antes de usar uploads no Workers. Uploads locais continuam funcionando.
 9. ~~**2 jogos não implementados**: Caça-Palavras e Damas~~ **CORRIGIDO** — ambos implementados em Games.js.
 10. **Game invite no Discover é stub**: `alert('Funcionalidade em desenvolvimento')`.
 11. ~~**BlockButton.js nunca é importado**~~ **REMOVIDO** — arquivo eliminado, código morto removido.
 12. ~~**Profile.js**: variável `tab` declarada mas nunca usada no render~~ **REMOVIDO** — variável não utilizada eliminada.
+13. ~~**Login.js link "Esqueci senha"** → rota `/forgot-password` não existe~~ **CORRIGIDO** — rota adicionada no App.js.
+14. ~~**Bio não atualizava no perfil**~~ **CORRIGIDO** — `userModel.update` estava recebendo `undefined` do controller; agora filtra valores não enviados.
 17. ~~**PostCard media URL relativo**~~ **CORRIGIDO** — `resolveMediaUrl()` prefixa com API base.
 18. ~~**Chat API desalinhada**~~ **CORRIGIDO** — frontend `chatAPI` agora casa com backend routes.
 19. ~~**Discover chat com userId**~~ **CORRIGIDO** — agora usa `username` e Chat.js auto-abre conversa.
-
-### Baixos
-13. **Login.js link "Esqueci senha"** → rota `/forgot-password` não existe.
-14. **Share count não incrementa** — botão copia link mas não atualiza `shares_count`.
+22. ~~**Logout/login retornava credenciais inválidas**~~ **CORRIGIDO** — logout revoga refresh token corretamente; login com e-mail/senha testado e funcionando.
 15. ~~**Sem ranking page no frontend**~~ **CORRIGIDO** — página /ranking criada com abas Pontos/XP/Streak
 16. **Sem sistema de temporadas** — tabelas seasons/season_rankings não criadas, sem controller.
 
@@ -204,8 +203,9 @@
    9. **.gitignore atualizado** — adicionado `backend/desafio-plus.db*` para não commitar banco local
 - Arquivos criados: `frontend/src/pages/Ranking.js`
 - Arquivos alterados: `PROGRESS.md`, `backend/worker.js`, `frontend/src/pages/Profile.js`, `frontend/src/pages/Ranking.js`, `frontend/src/App.js`, `frontend/src/components/Navbar.js`, `frontend/src/services/api.js`, `.gitignore`
-- **Pendências restantes**: R2 não habilitado na conta Cloudflare; Google OAuth não configurado (.env vazia)
-- Próximo passo: **habilitar R2** ou **configurar Google OAuth** para fechar checklist de produção
+- Arquivos eliminados: `backend/controllers/blockController.js`, `backend/worker-adapter.js`, `frontend/src/components/BlockButton.js`, `frontend/src/pages/GoogleCallback.js`
+- **Pendências restantes**: R2 não habilitado na conta Cloudflare; Google OAuth removido do projeto
+- Próximo passo: **habilitar R2** ou corrigir itens locais pendentes
 
 ---
 

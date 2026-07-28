@@ -64,6 +64,7 @@ export default function Navbar() {
               <NavBtn to="/explore" icon="🔭" label="Explorar" active={isActive('/explore')} />
               <NavBtn to="/challenges" icon="🎯" label="Desafios" active={isActive('/challenges')} />
               <NavBtn to="/games" icon="🎮" label="Jogos" active={isActive('/games')} />
+              <NavBtn to="/ranking" icon="🏆" label="Ranking" active={isActive('/ranking')} />
               <NavBtn to="/chat" icon="💬" label="Chat" active={isActive('/chat')} />
               <NavBtn to="/notifications" icon="🔔" label="Notif." active={isActive('/notifications')} badge={unreadCount} />
             </div>
@@ -112,6 +113,7 @@ export default function Navbar() {
           <BottomNavBtn to="/explore" icon="🔍" active={isActive('/explore')} badge={0} />
           <BottomNavBtn to="/challenges" icon="🎯" active={isActive('/challenges')} badge={0} />
           <BottomNavBtn to="/games" icon="🎮" active={isActive('/games')} badge={0} />
+          <BottomNavBtn to="/ranking" icon="🏆" active={isActive('/ranking')} badge={0} />
           <BottomNavBtn to="/chat" icon="💬" active={isActive('/chat')} badge={0} />
           <BottomNavBtn to="/notifications" icon="🔔" active={isActive('/notifications')} badge={unreadCount} />
         </nav>

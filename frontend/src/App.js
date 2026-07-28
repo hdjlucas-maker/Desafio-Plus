@@ -24,6 +24,7 @@ import Search from './pages/Search';
 import Settings from './pages/Settings';
 import PrivacySettings from './pages/PrivacySettings';
 import Discover from './pages/Discover'; // ✅ NOVO
+import Ranking from './pages/Ranking'; // ✅ NOVO
 
 // Componentes
 import Navbar from './components/Navbar';
@@ -136,6 +137,11 @@ const AppRoutes = () => {
           {/* ✅ NOVO — Página Descobrir Pessoas */}
           <Route path="/discover" element={
             <PrivateRoute><Discover /></PrivateRoute>
+          } />
+
+          {/* ✅ NOVO — Ranking */}
+          <Route path="/ranking" element={
+            <PrivateRoute><Ranking /></PrivateRoute>
           } />
 
           {/* 404 */}

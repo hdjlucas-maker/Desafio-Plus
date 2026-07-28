@@ -117,6 +117,7 @@ export const usersAPI = {
   block:         (userId)       => api.post(`/users/${userId}/block`),
   unblock:       (userId)       => api.delete(`/users/${userId}/block`),
   getBlocked:    ()             => api.get('/users/blocked'),
+  getRanking:    (params = {})  => api.get('/users/ranking', { params }),
 };
 
 export const searchAPI = {

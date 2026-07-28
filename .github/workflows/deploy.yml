@@ -20,6 +20,9 @@ jobs:
       - name: Install Dependencies
         run: npm install --prefix frontend
 
+      - name: Fix permissions for Linux runner
+        run: chmod +x frontend/node_modules/.bin/react-scripts || true
+
       - name: Build Project
         run: npm run build --prefix frontend
 

@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-# Quando ira chover !!!!! ?
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,11 +18,10 @@ jobs:
           node-version: 24
 
       - name: Install Dependencies
-        working-directory: frontend
-        run: npm install
+        run: npm install --prefix frontend
+
       - name: Build Project
-        working-directory: frontend
-        run: npm run build
+        run: npm run build --prefix frontend
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3

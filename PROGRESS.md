@@ -174,7 +174,10 @@
 - [x] Explore feed funcionando (bug args invertidos corrigido)
 - [x] Chat, follow, presence, search, ranking — **TESTADO EM PRODUÇÃO**
 - [x] Responsividade mobile: bottom nav, chat toggle, global.css importado
-- [ ] 3+ jogos jogáveis testados de ponta a ponta
+- [x] 3+ jogos jogáveis testados de ponta a ponta
+  - Testados: Jogo da Velha, Quiz e Memória
+  - Endpoints: POST /api/games/session, GET /api/games/my-history, GET /api/games/my-stats, GET /api/games/leaderboard
+  - Pontos e XP atualizados corretamente no perfil do usuário (verificado em produção)
 - [ ] Ranking page no frontend
 - [x] App publicado e acessível por URL pública — Workers API + Pages frontend
 - [x] 16/16 endpoints testados em produção (register, login, me, feed, explore, post, like, comment, chat, follow, profile, challenges, game session, stats, notifications, presence, search, ranking)

@@ -14,9 +14,6 @@ main = "backend/worker.js"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-# ── Build ───────────────────────────────────────────────────
-[build]
-command = "cd backend && npm install"
 
 # ── D1 Database ─────────────────────────────────────────────
 [[d1_databases]]

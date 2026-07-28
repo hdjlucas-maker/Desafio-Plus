@@ -27,7 +27,7 @@ const {
 let _googleClient = null;
 let _lastGcid = null;
 function getGoogleClient() {
-  const gCid = (globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID;
+  const gCid = ((globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID || '').trim();
   if (!gCid) return null;
   if (_googleClient && _lastGcid === gCid) return _googleClient;
   try {
@@ -87,16 +87,12 @@ async function notifyAllUsersNewMember(newUser) {
 async function register(req, res) {
   try {
     let { email, password, username, display_name } = req.body;
+    email = (email || '').trim().toLowerCase();
 
     // Validação
     if (!email || !password || !username || !display_name) {
       return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
     }
-
-    // Normaliza (evita e-mail/username salvos com maiúsculas divergindo do login)
-    email = String(email).trim().toLowerCase();
-    username = String(username).trim().toLowerCase();
-    display_name = String(display_name).trim();
     if (password.length < 8) {
       return res.status(400).json({ error: 'Senha deve ter pelo menos 8 caracteres' });
     }
@@ -140,12 +136,12 @@ async function register(req, res) {
 async function login(req, res) {
   try {
     let { email, password } = req.body;
+    email = (email || '').trim().toLowerCase();
 
     if (!email || !password) {
       return res.status(400).json({ error: 'E-mail e senha são obrigatórios' });
     }
 
-    email = String(email).trim().toLowerCase();
     const user = await userModel.findByEmail(email);
     if (!user || !user.password_hash) {
       return res.status(401).json({ error: 'Credenciais inválidas' });
@@ -188,11 +184,10 @@ async function googleAuth(req, res) {
 
     const ticket = await gc.verifyIdToken({
       idToken: id_token,
-      audience: (globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID,
+      audience: (((globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID) || '').trim(),
     });
     const payload = ticket.getPayload();
-    const { sub: googleId, name, picture } = payload;
-    const email = String(payload.email).trim().toLowerCase();
+    const { sub: googleId, email, name, picture } = payload;
 
     let isNew = false;
     let user = await userModel.findByGoogleId(googleId);
@@ -287,7 +282,8 @@ async function logout(req, res) {
 
 async function forgotPassword(req, res) {
   try {
-    const { email } = req.body;
+    let { email } = req.body;
+    email = (email || '').trim().toLowerCase();
     const user = await userModel.findByEmail(email);
     if (user) {
       const token = crypto.randomBytes(32).toString('hex');

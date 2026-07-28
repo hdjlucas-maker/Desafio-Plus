@@ -43,10 +43,11 @@ const Login = () => {
               .finally(() => setLoading(false));
           },
         });
+        const containerWidth = googleContainerRef.current?.offsetWidth || 300;
         window.google.accounts.id.renderButton(googleContainerRef.current, {
           theme: 'outline',
           size: 'large',
-          width: '100%',
+          width: Math.min(containerWidth, 400),
           text: 'signin_with',
           shape: 'rectangular',
           locale: 'pt_BR',
@@ -60,7 +61,6 @@ const Login = () => {
       setGError('Falha ao carregar Google. Verifique sua conexão.');
     };
     document.head.appendChild(script);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (e) => {

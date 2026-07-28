@@ -63,10 +63,11 @@ const Register = () => {
             }
           },
         });
+        const containerWidth = googleContainerRef.current?.offsetWidth || 300;
         window.google.accounts.id.renderButton(googleContainerRef.current, {
           theme: 'outline',
           size: 'large',
-          width: '100%',
+          width: Math.min(containerWidth, 400),
           text: 'signup_with',
           shape: 'rectangular',
           locale: 'pt_BR',
@@ -80,7 +81,6 @@ const Register = () => {
       setGError('Falha ao carregar Google. Verifique sua conexão.');
     };
     document.head.appendChild(script);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (e) => {
@@ -92,23 +92,14 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
-    if (!GOOGLE_CLIENT_ID) {
-      setError('Login com Google não configurado.');
-      return;
-    }
-
     const { display_name, username, email, password, confirmPassword } = form;
 
     if (!display_name.trim() || !username.trim() || !email.trim() || !password) {
       setError('Preencha todos os campos.');
       return;
     }
-    if (password.length < 8) {
-      setError('A senha deve ter pelo menos 8 caracteres.');
-      return;
-    }
-    if (!/^[a-z0-9_.]{3,20}$/.test(username.trim().toLowerCase())) {
-      setError('Usuário inválido: use 3-20 caracteres, apenas letras minúsculas, números, "_" ou ".".');
+    if (password.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres.');
       return;
     }
     if (password !== confirmPassword) {
@@ -118,11 +109,15 @@ const Register = () => {
 
     setLoading(true);
     try {
-      await register(email.trim().toLowerCase(), password, username.trim().toLowerCase(), display_name.trim());
+      await register(email.trim().toLowerCase(), password, username.trim(), display_name.trim());
       navigate('/feed');
     } catch (err) {
-      const msg = err?.response?.data?.error || err?.message || 'Erro ao criar conta. Tente novamente.';
-      setError(msg);
+      const msg = err?.response?.data?.error || err?.message || 'Erro ao cadastrar';
+      if (msg.includes('já')) {
+        setError(msg);
+      } else {
+        setError('Erro ao criar conta. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
@@ -160,9 +155,9 @@ const Register = () => {
 
         <form onSubmit={handleSubmit} noValidate>
           <InputField label="Nome" type="text" name="display_name" value={form.display_name} onChange={handleChange} placeholder="Seu nome completo" autoComplete="name" />
-          <InputField label="Usuário" type="text" name="username" value={form.username} onChange={handleChange} placeholder="apelido" hint="Apenas letras minúsculas, números, _ ou ." autoComplete="username" />
+          <InputField label="Usuário" type="text" name="username" value={form.username} onChange={handleChange} placeholder="apelido" hint="Apenas letras, números e underscore" autoComplete="username" />
           <InputField label="E-mail" type="email" name="email" value={form.email} onChange={handleChange} placeholder="seu@email.com" autoComplete="email" />
-          <InputField label="Senha" type="password" name="password" value={form.password} onChange={handleChange} placeholder="Mínimo 8 caracteres" autoComplete="new-password" />
+          <InputField label="Senha" type="password" name="password" value={form.password} onChange={handleChange} placeholder="Mínimo 6 caracteres" autoComplete="new-password" />
           <InputField label="Confirmar Senha" type="password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} placeholder="Repita a senha" autoComplete="new-password" />
 
           <button

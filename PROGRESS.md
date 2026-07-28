@@ -169,7 +169,10 @@
 - [x] Challenges API alinhada frontend↔backend
 - [x] getDailyChallenges params bug corrigido
 - [x] 10/10 jogos implementados (Caça-Palavras + Damas)
-- [ ] Pontos, XP, nível, streak calculando certo
+- [x] Pontos, XP, nível, streak calculando certo
+  - addXP calcula level = floor((total_xp) / 500) + 1 — testado via jogos (Jogo da Velha, Quiz, Memória)
+  - updateStreak atualiza streak diário em challenge_completions — testado em produção
+  - Jogos registram pontos corretamente e refletem no perfil
 - [x] Feed com post, mídia, like, comentário funcionando — **TESTADO EM PRODUÇÃO**
 - [x] Explore feed funcionando (bug args invertidos corrigido)
 - [x] Chat, follow, presence, search, ranking — **TESTADO EM PRODUÇÃO**

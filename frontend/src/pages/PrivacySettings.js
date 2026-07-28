@@ -5,19 +5,18 @@
 // ============================================================
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // ✅ CORRETO
+import { useAuth } from '../context/AuthContext';
+import { usersAPI } from '../services/api';
 import '../styles/PrivacySettings.css';
 
 const PrivacySettings = () => {
   const navigate = useNavigate();
-  const { user } = useAuth(); // ✅ CORRETO — sem useContext, sem AuthContext
-
-  const API = process.env.REACT_APP_API_URL || 'http://localhost:8787';
+  const { user } = useAuth();
 
   const [settings, setSettings] = useState({
     profile_public: true,
     show_online: true,
-    allow_messages: 'everyone', // 'everyone' | 'followers' | 'nobody'
+    allow_messages: 'everyone',
     show_in_search: true,
   });
 
@@ -26,45 +25,35 @@ const PrivacySettings = () => {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState('');
 
-  // ── Carrega configurações e lista de bloqueados ───────────
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (!token) { navigate('/login'); return; }
+    loadSettings();
+  }, []);
 
-    const headers = { Authorization: `Bearer ${token}` };
-
-    Promise.all([
-      fetch(`${API}/api/users/privacy-settings`, { headers }).then(r => r.json()).catch(() => null),
-      fetch(`${API}/api/users/blocked`, { headers }).then(r => r.json()).catch(() => ({ blocked: [] })),
-    ]).then(([privData, blockData]) => {
-      if (privData && !privData.error) {
-        setSettings(prev => ({ ...prev, ...privData }));
+  const loadSettings = async () => {
+    try {
+      const [settingsRes, blockedRes] = await Promise.all([
+        usersAPI.getSettings(),
+        usersAPI.getBlocked(),
+      ]);
+      if (settingsRes.data && !settingsRes.data.error) {
+        setSettings(prev => ({ ...prev, ...settingsRes.data }));
       }
-      setBlockedUsers(blockData?.blocked || []);
-    }).finally(() => setLoading(false));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+      setBlockedUsers(blockedRes.data?.blocked || []);
+    } catch {
+      showToast('❌ Erro ao carregar configurações.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ── Salva configurações ───────────────────────────────────
   const handleSave = async () => {
     setSaving(true);
     try {
-      const token = localStorage.getItem('access_token');
-      const res = await fetch(`${API}/api/users/privacy-settings`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(settings),
-      });
-
-      if (res.ok) {
-        showToast('✅ Configurações salvas!');
-      } else {
-        showToast('❌ Erro ao salvar. Tente novamente.');
-      }
+      await usersAPI.updateSettings(settings);
+      showToast('✅ Configurações salvas!');
     } catch {
-      showToast('❌ Sem conexão com o servidor.');
+      showToast('❌ Erro ao salvar. Tente novamente.');
     } finally {
       setSaving(false);
     }
@@ -72,12 +61,8 @@ const PrivacySettings = () => {
 
   // ── Desbloquear usuário ───────────────────────────────────
   const handleUnblock = async (userId, username) => {
-    const token = localStorage.getItem('access_token');
     try {
-      await fetch(`${API}/api/users/${userId}/unblock`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await usersAPI.unblock(userId);
       setBlockedUsers(prev => prev.filter(u => u.id !== userId));
       showToast(`✅ @${username} foi desbloqueado.`);
     } catch {

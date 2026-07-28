@@ -76,7 +76,10 @@ function honoMiddleware(expressMiddleware) {
     };
 
     let parsedBody = undefined;
-    try { parsedBody = await c.req.json().catch(() => ({})); } catch { parsedBody = {}; }
+    const contentType = c.req.header('content-type') || '';
+    if (contentType.includes('application/json')) {
+      try { parsedBody = await c.req.json().catch(() => ({})); } catch { parsedBody = {}; }
+    }
 
     const req = {
       get user() { return c.get('user') || null; },
@@ -179,6 +182,46 @@ app.get('/api/feed/explore', honoMiddleware(optionalAuth), toHono(async (req, re
   const posts = await postModel.getExplorePosts(req.user?.id, parseInt(limit), parseInt(offset), req.d1);
   res.json(posts);
 }));
+
+// ── Upload R2 (Workers) ─────────────────────────────────────────────────────
+app.post('/api/upload', honoMiddleware(requireAuth), async (c) => {
+  try {
+    const formData = await c.req.formData();
+    const file = formData.get('file');
+    const folder = formData.get('folder') || 'uploads';
+    const allowed = ['image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm'];
+    if (!file || typeof file === 'string') return c.json({ error: 'Arquivo não enviado' }, 400);
+
+    const ext = file.type.split('/')[1] || 'bin';
+    const key = `${folder}/${crypto.randomUUID()}.${ext}`;
+    const buf = Buffer.from(await file.arrayBuffer());
+
+    await c.env.MEDIA_BUCKET.put(key, buf, {
+      httpMetadata: { contentType: file.type, cacheControl: 'public, max-age=31536000' },
+    });
+
+    return c.json({ success: true, key, url: `/api/media/${key}`, type: file.type, size: buf.length });
+  } catch (err) {
+    console.error('[UPLOAD]', err);
+    return c.json({ error: 'Erro ao enviar arquivo' }, 500);
+  }
+});
+
+app.get('/api/media/:key', async (c) => {
+  const key = c.req.param('key');
+  const obj = await c.env.MEDIA_BUCKET.get(key);
+  if (!obj) return c.json({ error: 'Arquivo não encontrado' }, 404);
+  const headers = new Headers();
+  headers.set('Content-Type', obj.httpMetadata?.contentType || 'application/octet-stream');
+  headers.set('Cache-Control', obj.httpMetadata?.cacheControl || 'public, max-age=31536000');
+  return c.newResponse(obj.body, { headers });
+});
+
+app.delete('/api/media/:key', honoMiddleware(requireAuth), async (c) => {
+  const key = c.req.param('key');
+  await c.env.MEDIA_BUCKET.delete(key);
+  return c.json({ success: true });
+});
 
 // ── Challenges Routes ──────────────────────────────────────────────────────
 app.get('/api/challenges/daily', honoMiddleware(requireAuth), toHono(challengesCtrl.getDailyChallenges));

@@ -10,7 +10,6 @@ import { AuthProvider, useAuth } from './context/AuthContext'; // ✅ useAuth, n
 // Páginas de autenticação
 import Login from './pages/Login';
 import Register from './pages/Register';
-import GoogleCallback from './pages/GoogleCallback';
 import ForgotPassword from './pages/ForgotPassword';
 
 // Páginas principais
@@ -88,9 +87,6 @@ const AppRoutes = () => {
           } />
 
           <Route path="/forgot-password" element={<ForgotPassword />} />
-
-          {/* Callback do Google OAuth — sempre acessível */}
-          <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
           {/* ── Rotas protegidas ── */}
           <Route path="/feed" element={

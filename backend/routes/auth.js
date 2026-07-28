@@ -5,7 +5,6 @@
  * Rotas disponíveis:
  *   POST /api/auth/register        — Cadastro com email/senha
  *   POST /api/auth/login           — Login com email/senha
- *   POST /api/auth/google          — Login/cadastro com Google (id_token)
  *   POST /api/auth/refresh         — Renovar access token
  *   POST /api/auth/logout          — Logout (revoga refresh token)
  *   POST /api/auth/forgot-password — Solicitar reset de senha
@@ -32,9 +31,6 @@ router.post('/register', authLimiter, sanitizeInputs, ctrl.register);
 
 // Login
 router.post('/login', authLimiter, sanitizeInputs, ctrl.login);
-
-// Google OAuth — recebe { id_token } no body e retorna { access_token, refresh_token, user }
-router.post('/google', authLimiter, ctrl.googleAuth);
 
 // Refresh token — recebe { refresh_token } e retorna novo par de tokens
 router.post('/refresh', ctrl.refreshToken);

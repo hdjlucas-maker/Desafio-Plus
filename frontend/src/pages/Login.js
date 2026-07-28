@@ -1,75 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Auth.css';
 
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
-
 const Login = () => {
   const navigate = useNavigate();
-  const { login, googleLogin } = useAuth();
+  const { login } = useAuth();
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [gError, setGError] = useState('');
-  const googleContainerRef = useRef(null);
-  const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || initializedRef.current) return;
-    initializedRef.current = true;
-
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      try {
-        if (!window.google?.accounts?.id) {
-          setGError('Erro ao carregar Google. Recarregue a página.');
-          return;
-        }
-        window.google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: (response) => {
-            setLoading(true);
-            setError('');
-            googleLogin(response.credential)
-              .then(() => navigate('/feed'))
-              .catch((err) => {
-                setError(err?.response?.data?.error || 'Erro ao entrar com Google');
-              })
-              .finally(() => setLoading(false));
-          },
-        });
-        const renderGoogleButton = () => {
-          const containerWidth = googleContainerRef.current?.offsetWidth || 300;
-          googleContainerRef.current.innerHTML = '';
-          window.google.accounts.id.renderButton(googleContainerRef.current, {
-            theme: 'outline',
-            size: 'large',
-            width: Math.min(containerWidth, 400),
-            text: 'signin_with',
-            shape: 'rectangular',
-            locale: 'pt_BR',
-          });
-        };
-
-        // Espera o layout estabilizar (fontes, rotação de tela) antes de medir
-        requestAnimationFrame(renderGoogleButton);
-        window.addEventListener('resize', renderGoogleButton);
-        window.addEventListener('orientationchange', renderGoogleButton);
-      } catch (e) {
-        setGError('Google indisponível no momento. Tente de novo.');
-        console.error('Google init error:', e);
-      }
-    };
-    script.onerror = () => {
-      setGError('Falha ao carregar Google. Verifique sua conexão.');
-    };
-    document.head.appendChild(script);
-  });
+    document.head.querySelector('script[src*="accounts.google.com"]')?.remove();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -167,16 +111,6 @@ const Login = () => {
             )}
           </button>
         </form>
-
-        {GOOGLE_CLIENT_ID ? (
-          <>
-            <div className="auth-divider"><span>ou</span></div>
-            {gError ? (
-              <div className="alert alert-error" style={{ fontSize: '0.85rem' }}>{gError}</div>
-            ) : null}
-            <div ref={googleContainerRef} style={{ width: '100%', minHeight: '48px' }} />
-          </>
-        ) : null}
 
         <p className="auth-footer-text">
           Não tem conta?{' '}

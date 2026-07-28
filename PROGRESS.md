@@ -131,7 +131,7 @@
 21. ~~**Presence nearby usava display_name para filtrar estado**~~ **CORRIGIDO** — `/api/presence/nearby` agora usa tabela `user_presence.state`
 
 ### Médios
-4. **Google OAuth não configurado**: `.env` tem `GOOGLE_CLIENT_ID=` e `GOOGLE_CLIENT_SECRET=` vazios. Login.js mostra "em breve". Register.js redireciona para backend (funciona se configurado).
+4. ~~**Google OAuth não configurado**~~ **REMOVIDO** — login com Google removido do frontend e backend. Restam apenas e-mail/senha.
 5. **Password reset sem envio de email**: Token logado no console. `nodemailer` instalado mas não usado.
 6. **PrivacySettings usa fetch() em vez de axios** — usa `access_token` do localStorage (consistente com AuthContext).
 7. ~~**Two localStorage keys**: `api.js` lê `token`, AuthContext usa `access_token`~~ **CORRIGIDO** — `api.js` agora usa `access_token`.
@@ -155,7 +155,6 @@
 ## Checklist geral (marque conforme evolui)
 
 - [x] Cadastro e login funcionando (JWT) — alice@test.com/alice123, bob@test.com/bob12345
-- [ ] Login com Google testado de ponta a ponta (precisa configurar `.env`)
 - [x] Deploy em produção confirmado (Workers + Pages) — Backend em Hono, frontend com REACT_APP_API_URL configurado
 - [x] **15+ desafios ativos por modo (solo/a_dois/turma) — 48 desafios (16 por modo)**
 - [x] **15 badges com critério de desbloqueio — inseridos via seed.js**

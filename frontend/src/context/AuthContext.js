@@ -80,13 +80,6 @@ export function AuthProvider({ children }) {
     return data.user;
   };
 
-  const googleLogin = async (idToken) => {
-    const { data } = await api.post('/auth/google', { id_token: idToken });
-    saveTokens(data.access_token, data.refresh_token);
-    setUser(data.user);
-    return data.user;
-  };
-
   const logout = async () => {
     try {
       const refreshToken = localStorage.getItem('refresh_token');
@@ -121,7 +114,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, googleLogin, logout, updateUser, fetchMe }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser, fetchMe }}>
       {children}
     </AuthContext.Provider>
   );

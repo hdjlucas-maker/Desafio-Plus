@@ -143,7 +143,6 @@ app.get('/health', (c) => c.json({ status: 'ok', runtime: 'cloudflare-workers' }
 // ── Auth Routes ────────────────────────────────────────────────────────────
 app.post('/api/auth/register', toHono(authCtrl.register));
 app.post('/api/auth/login', toHono(authCtrl.login));
-app.post('/api/auth/google', toHono(authCtrl.googleAuth));
 app.post('/api/auth/refresh', toHono(authCtrl.refreshToken));
 app.post('/api/auth/logout', toHono(authCtrl.logout));
 app.post('/api/auth/forgot-password', toHono(authCtrl.forgotPassword));

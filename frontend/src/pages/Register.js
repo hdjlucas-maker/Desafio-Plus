@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Auth.css';
-
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 
 const InputField = ({ label, type, name, value, onChange, placeholder, hint, autoComplete }) => (
   <div className="form-group">
@@ -23,72 +21,17 @@ const InputField = ({ label, type, name, value, onChange, placeholder, hint, aut
 
 const Register = () => {
   const navigate = useNavigate();
-  const { register, googleLogin } = useAuth();
-  const googleContainerRef = useRef(null);
-  const initializedRef = useRef(false);
+  const { register } = useAuth();
 
   const [form, setForm] = useState({
     display_name: '', username: '', email: '', password: '', confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [gError, setGError] = useState('');
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || initializedRef.current) return;
-    initializedRef.current = true;
-
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      try {
-        if (!window.google?.accounts?.id) {
-          setGError('Erro ao carregar Google. Recarregue a página.');
-          return;
-        }
-        window.google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: async (response) => {
-            setLoading(true);
-            setError('');
-            try {
-              await googleLogin(response.credential);
-              navigate('/feed');
-            } catch (err) {
-              setError(err?.response?.data?.error || 'Erro ao cadastrar com Google');
-            } finally {
-              setLoading(false);
-            }
-          },
-        });
-        const renderGoogleButton = () => {
-          const containerWidth = googleContainerRef.current?.offsetWidth || 300;
-          googleContainerRef.current.innerHTML = '';
-          window.google.accounts.id.renderButton(googleContainerRef.current, {
-            theme: 'outline',
-            size: 'large',
-            width: Math.min(containerWidth, 400),
-            text: 'signup_with',
-            shape: 'rectangular',
-            locale: 'pt_BR',
-          });
-        };
-
-        requestAnimationFrame(renderGoogleButton);
-        window.addEventListener('resize', renderGoogleButton);
-        window.addEventListener('orientationchange', renderGoogleButton);
-      } catch (e) {
-        setGError('Google indisponível no momento. Tente de novo.');
-        console.error('Google init error:', e);
-      }
-    };
-    script.onerror = () => {
-      setGError('Falha ao carregar Google. Verifique sua conexão.');
-    };
-    document.head.appendChild(script);
-  } );
+    document.head.querySelector('script[src*="accounts.google.com"]')?.remove();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -146,19 +89,9 @@ const Register = () => {
           </div>
         )}
 
-        {GOOGLE_CLIENT_ID ? (
-          <>
-            {gError ? (
-              <div className="alert alert-error" style={{ fontSize: '0.85rem' }}>{gError}</div>
-            ) : null}
-            <div ref={googleContainerRef} style={{ width: '100%', minHeight: '48px' }} />
-            <div className="auth-divider"><span>ou</span></div>
-          </>
-        ) : (
-          <div className="alert alert-info" style={{ fontSize: '0.85rem', marginBottom: '1rem' }}>
-            Login com Google será disponibilizado em breve.
-          </div>
-        )}
+        <div className="alert alert-info" style={{ fontSize: '0.85rem', marginBottom: '1rem' }}>
+          Cadastre-se com e-mail e senha para participar.
+        </div>
 
         <form onSubmit={handleSubmit} noValidate>
           <InputField label="Nome" type="text" name="display_name" value={form.display_name} onChange={handleChange} placeholder="Seu nome completo" autoComplete="name" />

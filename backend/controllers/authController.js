@@ -28,7 +28,7 @@ const {
 // APIs do Node (https/crypto) que não funcionam de forma confiável dentro do
 // Cloudflare Workers. Essa versão usa fetch puro, que funciona igual local e no Workers.
 function getGoogleClientId() {
-  return (globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID || null;
+  return process.env.GOOGLE_CLIENT_ID || null;
 }
 
 async function verifyGoogleIdToken(idToken, expectedAudience) {

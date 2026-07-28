@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../hooks/useNotifications';
-import { searchAPI } from '../services/api';
+// REMOVIDO: searchAPI foi retirado daqui para corrigir o erro do ESLint
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -36,8 +36,8 @@ export default function Navbar() {
   return (
     <>
       {/* ── Top Bar (sempre visível) ── */}
-      <nav className="navbar-top">
-        <Link to="/" className="navbar-logo">
+      <nav className="navbar-top" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', padding: '0.75rem 1.5rem' }}>
+        <Link to="/" className="navbar-logo" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
           <span style={{ fontSize: '1.5rem' }}>🎯</span>
           <span className="gradient-text" style={{ fontFamily: 'Poppins', fontWeight: 800, fontSize: '1.1rem' }}>
             Desafio+
@@ -45,21 +45,21 @@ export default function Navbar() {
         </Link>
 
         {user && (
-          <form onSubmit={handleSearch} className="navbar-search">
+          <form onSubmit={handleSearch} className="navbar-search" style={{ flex: 1, maxWidth: '320px' }}>
             <input
               className="input"
               value={searchQ}
               onChange={e => setSearchQ(e.target.value)}
               placeholder="🔍 Buscar..."
-              style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+              style={{ width: '100%', padding: '0.5rem 1rem', fontSize: '0.85rem' }}
             />
           </form>
         )}
 
         {user ? (
-          <div className="navbar-right">
-            {/* Desktop nav links — hidden on mobile */}
-            <div className="navbar-links-desktop">
+          <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginLeft: 'auto' }}>
+            {/* Desktop nav links — adicionado gap de 0.5rem para afastar os botões */}
+            <div className="navbar-links-desktop" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <NavBtn to="/feed" icon="🏠" label="Feed" active={isActive('/feed')} />
               <NavBtn to="/explore" icon="🔭" label="Explorar" active={isActive('/explore')} />
               <NavBtn to="/challenges" icon="🎯" label="Desafios" active={isActive('/challenges')} />
@@ -68,11 +68,12 @@ export default function Navbar() {
               <NavBtn to="/notifications" icon="🔔" label="Notif." active={isActive('/notifications')} badge={unreadCount} />
             </div>
 
-            {/* Avatar menu — always visible */}
+            {/* Avatar menu — com sutil espaçamento interno */}
             <div style={{ position: 'relative' }}>
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="navbar-avatar-btn"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 {user.avatar_url
                   ? <img src={user.avatar_url} alt="" className="avatar avatar-sm" />
@@ -84,7 +85,7 @@ export default function Navbar() {
               </button>
 
               {menuOpen && (
-                <div className="navbar-dropdown">
+                <div className="navbar-dropdown" style={{ zIndex: 10 }}>
                   <MenuItem to={`/profile/${user.username}`} icon="👤" label="Meu Perfil" onClick={() => setMenuOpen(false)} />
                   <MenuItem to="/settings" icon="⚙️" label="Configurações" onClick={() => setMenuOpen(false)} />
                   <MenuItem to="/discover" icon="🌍" label="Descobrir Pessoas" onClick={() => setMenuOpen(false)} />
@@ -97,7 +98,7 @@ export default function Navbar() {
             </div>
           </div>
         ) : (
-          <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', marginLeft: 'auto' }}>
             <Link to="/login" className="btn btn-secondary" style={{ padding: '0.5rem 1rem' }}>Entrar</Link>
             <Link to="/register" className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>Cadastrar</Link>
           </div>
@@ -107,11 +108,11 @@ export default function Navbar() {
       {/* ── Bottom Nav (mobile only, user logged in) ── */}
       {user && (
         <nav className="navbar-bottom">
-          <BottomNavBtn to="/feed" icon="🏠" active={isActive('/feed')} />
-          <BottomNavBtn to="/explore" icon="🔍" active={isActive('/explore')} />
-          <BottomNavBtn to="/challenges" icon="🎯" active={isActive('/challenges')} />
-          <BottomNavBtn to="/games" icon="🎮" active={isActive('/games')} />
-          <BottomNavBtn to="/chat" icon="💬" active={isActive('/chat')} />
+          <BottomNavBtn to="/feed" icon="🏠" active={isActive('/feed')} badge={0} />
+          <BottomNavBtn to="/explore" icon="🔍" active={isActive('/explore')} badge={0} />
+          <BottomNavBtn to="/challenges" icon="🎯" active={isActive('/challenges')} badge={0} />
+          <BottomNavBtn to="/games" icon="🎮" active={isActive('/games')} badge={0} />
+          <BottomNavBtn to="/chat" icon="💬" active={isActive('/chat')} badge={0} />
           <BottomNavBtn to="/notifications" icon="🔔" active={isActive('/notifications')} badge={unreadCount} />
         </nav>
       )}
@@ -121,7 +122,7 @@ export default function Navbar() {
 
 function NavBtn({ to, icon, label, active, badge }) {
   return (
-    <Link to={to} style={{ position: 'relative' }}>
+    <Link to={to} style={{ position: 'relative', textDecoration: 'none' }}>
       <button style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         padding: '0.4rem 0.6rem', borderRadius: 'var(--radius-sm)',
@@ -141,8 +142,8 @@ function NavBtn({ to, icon, label, active, badge }) {
 
 function BottomNavBtn({ to, icon, active, badge }) {
   return (
-    <Link to={to} className="bottom-nav-item" style={{ color: active ? 'var(--purple-light)' : 'var(--text-muted)' }}>
-      <span style={{ fontSize: '1.3rem', position: 'relative' }}>
+    <Link to={to} className="bottom-nav-item" style={{ color: active ? 'var(--purple-light)' : 'var(--text-muted)', textDecoration: 'none' }}>
+      <span style={{ fontSize: '1.3rem', position: 'relative', display: 'inline-block' }}>
         {icon}
         {badge > 0 && (
           <span className="navbar-badge" style={{ top: -4, right: -8 }}>{badge > 9 ? '9+' : badge}</span>
@@ -154,7 +155,7 @@ function BottomNavBtn({ to, icon, active, badge }) {
 
 function MenuItem({ to, icon, label, onClick }) {
   return (
-    <Link to={to} onClick={onClick} className="navbar-menu-item">
+    <Link to={to} onClick={onClick} className="navbar-menu-item" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       {icon} {label}
     </Link>
   );

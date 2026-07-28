@@ -1,5 +1,5 @@
 // ============================================================
-// App.js — ATUALIZADO v7
+// App.js — ATUALIZADO v7 (Com Correção de Espaçamento Global)
 // Adicionado: rota /discover, OnlineNotification no layout
 // Mantido: tudo o mais idêntico ao original
 // ============================================================
@@ -60,84 +60,98 @@ const AppRoutes = () => {
     <>
       {user && <Navbar />}
       {user && <OnlineNotification />} {/* ✅ NOVO — toast de presença */}
-      <Routes>
-        {/* ── Rotas públicas ── */}
-        <Route path="/" element={<Navigate to={user ? '/feed' : '/login'} replace />} />
+      
+      {/* 
+        AJUSTE: Adicionada tag <main> com espaçamento dinâmico.
+        Se o usuário estiver logado, cria uma margem segura para não colar na Navbar (desktop) 
+        e na BottomNav (mobile).
+      */}
+      <main style={{ 
+        padding: user ? '1.5rem 1rem 5rem 1rem' : '0', 
+        maxWidth: user ? '1200px' : '100%', 
+        margin: '0 auto',
+        minHeight: '100vh',
+        boxSizing: 'border-box'
+      }}>
+        <Routes>
+          {/* ── Rotas públicas ── */}
+          <Route path="/" element={<Navigate to={user ? '/feed' : '/login'} replace />} />
 
-        <Route path="/login" element={
-          <PublicRoute><Login /></PublicRoute>
-        } />
+          <Route path="/login" element={
+            <PublicRoute><Login /></PublicRoute>
+          } />
 
-        <Route path="/register" element={
-          <PublicRoute><Register /></PublicRoute>
-        } />
+          <Route path="/register" element={
+            <PublicRoute><Register /></PublicRoute>
+          } />
 
-        {/* Callback do Google OAuth — sempre acessível */}
-        <Route path="/auth/google/callback" element={<GoogleCallback />} />
+          {/* Callback do Google OAuth — sempre acessível */}
+          <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
-        {/* ── Rotas protegidas ── */}
-        <Route path="/feed" element={
-          <PrivateRoute><Feed /></PrivateRoute>
-        } />
+          {/* ── Rotas protegidas ── */}
+          <Route path="/feed" element={
+            <PrivateRoute><Feed /></PrivateRoute>
+          } />
 
-        <Route path="/explore" element={
-          <PrivateRoute><Explore /></PrivateRoute>
-        } />
+          <Route path="/explore" element={
+            <PrivateRoute><Explore /></PrivateRoute>
+          } />
 
-        <Route path="/profile/:username?" element={
-          <PrivateRoute><Profile /></PrivateRoute>
-        } />
+          <Route path="/profile/:username?" element={
+            <PrivateRoute><Profile /></PrivateRoute>
+          } />
 
-        <Route path="/chat" element={
-          <PrivateRoute><Chat /></PrivateRoute>
-        } />
+          <Route path="/chat" element={
+            <PrivateRoute><Chat /></PrivateRoute>
+          } />
 
-        <Route path="/chat/:username" element={
-          <PrivateRoute><Chat /></PrivateRoute>
-        } />
+          <Route path="/chat/:username" element={
+            <PrivateRoute><Chat /></PrivateRoute>
+          } />
 
-        <Route path="/challenges" element={
-          <PrivateRoute><Challenges /></PrivateRoute>
-        } />
+          <Route path="/challenges" element={
+            <PrivateRoute><Challenges /></PrivateRoute>
+          } />
 
-        <Route path="/games" element={
-          <PrivateRoute><Games /></PrivateRoute>
-        } />
+          <Route path="/games" element={
+            <PrivateRoute><Games /></PrivateRoute>
+          } />
 
-        <Route path="/notifications" element={
-          <PrivateRoute><Notifications /></PrivateRoute>
-        } />
+          <Route path="/notifications" element={
+            <PrivateRoute><Notifications /></PrivateRoute>
+          } />
 
-        <Route path="/search" element={
-          <PrivateRoute><Search /></PrivateRoute>
-        } />
+          <Route path="/search" element={
+            <PrivateRoute><Search /></PrivateRoute>
+          } />
 
-        <Route path="/settings" element={
-          <PrivateRoute><Settings /></PrivateRoute>
-        } />
+          <Route path="/settings" element={
+            <PrivateRoute><Settings /></PrivateRoute>
+          } />
 
-        <Route path="/settings/privacy" element={
-          <PrivateRoute><PrivacySettings /></PrivateRoute>
-        } />
+          <Route path="/settings/privacy" element={
+            <PrivateRoute><PrivacySettings /></PrivateRoute>
+          } />
 
-        {/* ✅ NOVO — Página Descobrir Pessoas */}
-        <Route path="/discover" element={
-          <PrivateRoute><Discover /></PrivateRoute>
-        } />
+          {/* ✅ NOVO — Página Descobrir Pessoas */}
+          <Route path="/discover" element={
+            <PrivateRoute><Discover /></PrivateRoute>
+          } />
 
-        {/* 404 */}
-        <Route path="*" element={
-          <div style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            justifyContent: 'center', minHeight: '100vh', color: '#fff',
-            background: '#0a0a1a', gap: '16px'
-          }}>
-            <h1 style={{ fontSize: '4rem', margin: 0 }}>404</h1>
-            <p style={{ color: 'rgba(255,255,255,0.5)' }}>Página não encontrada</p>
-            <a href="/feed" style={{ color: '#a855f7', textDecoration: 'none' }}>← Voltar ao Feed</a>
-          </div>
-        } />
-      </Routes>
+          {/* 404 */}
+          <Route path="*" element={
+            <div style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              justifyContent: 'center', minHeight: '80vh', color: '#fff',
+              background: '#0a0a1a', gap: '16px'
+            }}>
+              <h1 style={{ fontSize: '4rem', margin: 0 }}>404</h1>
+              <p style={{ color: 'rgba(255,255,255,0.5)' }}>Página não encontrada</p>
+              <a href="/feed" style={{ color: '#a855f7', textDecoration: 'none' }}>← Voltar ao Feed</a>
+            </div>
+          } />
+        </Routes>
+      </main>
     </>
   );
 };

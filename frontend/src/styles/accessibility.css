@@ -7,27 +7,14 @@
      • Foco visível (WCAG 2.4.7)
      • Fonte base ligeiramente maior
      • Sem animações para quem prefere (prefers-reduced-motion)
-   
-   Classes do projeto que NÃO são tocadas aqui:
-     .btn, .btn-primary, .btn-google, .btn-secondary
-     .auth-card, .auth-title, .auth-subtitle
-     .alert, .alert-error, .alert-success
-     .form-group, .form-label, .form-input
-     .card, .modal, .navbar, .spinner
    ============================================================ */
 
-/* ── 1. Fonte base: 17px (era 16px implícito do browser)
-        Só afeta o html — o body herda, mas todas as classes
-        do projeto que usam rem já ficam proporcionalmente maiores.
-        NÃO muda nenhuma classe específica. ─────────────────── */
+/* ── 1. Fonte base: 16.5px (Proporção equilibrada para herança) ── */
 html {
-  font-size: 17px;
+  font-size: 16.5px;
 }
 
-/* ── 2. Área de toque mínima WCAG 2.5.5 (44×44px)
-        Usa min-height/min-width para NÃO sobrescrever padding,
-        display, flex, gap, border-radius ou qualquer outra
-        propriedade visual dos botões do projeto. ─────────────── */
+/* ── 2. Área de toque mínima WCAG 2.5.5 (44×44px) ──────────────── */
 button:not([data-no-a11y]),
 [role="button"]:not([data-no-a11y]),
 input[type="submit"],
@@ -37,9 +24,7 @@ input[type="reset"] {
   min-width: 44px;
 }
 
-/* ── 3. Inputs: altura mínima de 48px
-        Só adiciona min-height — NÃO muda padding, border,
-        background, color ou font-size do .form-input do projeto. ── */
+/* ── 3. Inputs: altura mínima de 44px (Alinhado com a WCAG sem deformar) ── */
 input[type="text"]:not([data-no-a11y]),
 input[type="email"]:not([data-no-a11y]),
 input[type="password"]:not([data-no-a11y]),
@@ -49,27 +34,20 @@ input[type="url"]:not([data-no-a11y]),
 input[type="number"]:not([data-no-a11y]),
 textarea:not([data-no-a11y]),
 select:not([data-no-a11y]) {
-  min-height: 48px;
+  min-height: 44px;
 }
 
-/* ── 4. Foco visível (WCAG 2.4.7)
-        O projeto usa outline:none em .form-input:focus e
-        substitui por box-shadow. Aqui adicionamos :focus-visible
-        que só dispara com teclado — não interfere com mouse. ─── */
+/* ── 4. Foco visível (WCAG 2.4.7) ──────────────────────────────── */
 :focus-visible {
   outline: 3px solid #a855f7 !important;
   outline-offset: 3px !important;
 }
 
-/* Remove outline feio do browser apenas quando :focus-visible
-   está disponível (browsers modernos) */
 :focus:not(:focus-visible) {
   outline: none;
 }
 
-/* ── 5. Skip link (acessibilidade para teclado)
-        Elemento oculto que aparece ao pressionar Tab.
-        Não conflita com nada — classe exclusiva. ─────────────── */
+/* ── 5. Skip link (acessibilidade para teclado) ─────────────────── */
 .a11y-skip-link {
   position: absolute;
   top: -100%;
@@ -88,8 +66,7 @@ select:not([data-no-a11y]) {
   top: 0;
 }
 
-/* ── 6. Sem animações para quem prefere (prefers-reduced-motion)
-        Respeita preferência do sistema operacional. ─────────── */
+/* ── 6. Sem animações para quem prefere (prefers-reduced-motion) ── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -108,25 +85,28 @@ select:not([data-no-a11y]) {
   }
 }
 
-/* ── 8. Resolução 800×600 — ajustes mínimos ─────────────────── */
+/* ── 8. Resolução mobile (<= 800px) ─────────────────────────── */
 @media (max-width: 800px) {
   html {
-    font-size: 16px;
+    font-size: 15.5px;
   }
 
-  /* Botões e inputs ainda maiores em telas pequenas */
+  /* 
+    Mantém o tamanho padrão WCAG de 44px no mobile. 
+    Mudar para 52px estava quebrando o layout e espremendo os objetos.
+  */
   button:not([data-no-a11y]),
   [role="button"]:not([data-no-a11y]),
   input[type="submit"],
   input[type="button"] {
-    min-height: 52px;
+    min-height: 44px;
   }
 
   input[type="text"]:not([data-no-a11y]),
   input[type="email"]:not([data-no-a11y]),
   input[type="password"]:not([data-no-a11y]),
   textarea:not([data-no-a11y]) {
-    min-height: 52px;
+    min-height: 44px;
   }
 }
 

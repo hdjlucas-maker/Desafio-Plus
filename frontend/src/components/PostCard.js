@@ -75,41 +75,41 @@ export default function PostCard({ post, onUpdate, onDelete }) {
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR });
 
   return (
-    <div className="card" style={{ marginBottom: '1rem' }}>
+    <div className="card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-        <Link to={`/profile/${post.username}`}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+        <Link to={`/profile/${post.username}`} style={{ display: 'block', flexShrink: 0 }}>
           {post.avatar_url
             ? <img src={post.avatar_url} alt="" className="avatar avatar-md" />
             : <div className="avatar avatar-md" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', background: 'var(--bg-hover)' }}>👤</div>
           }
         </Link>
-        <div style={{ flex: 1 }}>
-          <Link to={`/profile/${post.username}`} style={{ fontWeight: 700, fontSize: '0.95rem' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+          <Link to={`/profile/${post.username}`} style={{ fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', color: 'inherit' }}>
             {post.display_name}
           </Link>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>@{post.username}</span>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>@{post.username}</span>
             <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>·</span>
             <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{timeAgo}</span>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span className="badge badge-comum" style={{ fontSize: '0.7rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span className="badge badge-comum" style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem' }}>
             {CATEGORY_LABELS[post.category] || post.category}
           </span>
           {user?.id === post.user_id && (
             <div style={{ position: 'relative' }}>
-              <button className="btn-ghost" onClick={() => setMenuOpen(!menuOpen)}>⋯</button>
+              <button className="btn-ghost" onClick={() => setMenuOpen(!menuOpen)} style={{ padding: '0.25rem 0.5rem', cursor: 'pointer' }}>⋯</button>
               {menuOpen && (
                 <div style={{
-                  position: 'absolute', right: 0, top: '100%',
+                  position: 'absolute', right: 0, top: '120%',
                   background: 'var(--bg-card)', border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-md)', padding: '0.25rem',
-                  zIndex: 10, minWidth: 120,
+                  borderRadius: 'var(--radius-md)', padding: '0.35rem',
+                  zIndex: 10, minWidth: 130, boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 }}>
                   <button onClick={handleDelete} style={{
-                    display: 'block', width: '100%', padding: '0.5rem 0.75rem',
+                    display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', padding: '0.5rem 0.75rem',
                     color: '#ef4444', fontSize: '0.85rem', textAlign: 'left',
                     background: 'none', border: 'none', cursor: 'pointer', borderRadius: 'var(--radius-sm)',
                   }}>🗑️ Remover</button>
@@ -121,20 +121,20 @@ export default function PostCard({ post, onUpdate, onDelete }) {
       </div>
 
       {/* Content */}
-      <p style={{ marginBottom: '0.75rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{post.content}</p>
+      <p style={{ marginBottom: '1rem', lineHeight: 1.6, whiteSpace: 'pre-wrap', fontSize: '0.95rem' }}>{post.content}</p>
 
       {/* Media */}
       {post.media_urls?.length > 0 && (
-        <div style={{ marginBottom: '0.75rem', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+        <div style={{ marginBottom: '1rem', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
           {post.media_type === 'video'
-            ? <video src={resolveMediaUrl(post.media_urls[0])} controls style={{ width: '100%', maxHeight: 400, objectFit: 'cover' }} />
-            : <img src={resolveMediaUrl(post.media_urls[0])} alt="" style={{ width: '100%', maxHeight: 400, objectFit: 'cover' }} />
+            ? <video src={resolveMediaUrl(post.media_urls[0])} controls style={{ width: '100%', maxHeight: 420, objectFit: 'cover' }} />
+            : <img src={resolveMediaUrl(post.media_urls[0])} alt="" style={{ width: '100%', maxHeight: 420, objectFit: 'cover' }} />
           }
         </div>
       )}
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: '1rem', paddingTop: '0.5rem', borderTop: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', gap: '1.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border)' }}>
         <ActionBtn
           icon={liked ? '❤️' : '🤍'}
           count={likesCount}
@@ -158,26 +158,26 @@ export default function PostCard({ post, onUpdate, onDelete }) {
 
       {/* Comments */}
       {showComments && (
-        <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border)' }}>
+        <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {comments.map(c => (
-            <div key={c.id} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <div className="avatar avatar-sm" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-hover)', fontSize: '0.9rem' }}>👤</div>
-              <div style={{ background: 'var(--bg-hover)', borderRadius: 'var(--radius-md)', padding: '0.5rem 0.75rem', flex: 1 }}>
+            <div key={c.id} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+              <div className="avatar avatar-sm" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-hover)', fontSize: '0.9rem', flexShrink: 0 }}>👤</div>
+              <div style={{ background: 'var(--bg-hover)', borderRadius: 'var(--radius-md)', padding: '0.6rem 0.85rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{c.display_name} </span>
-                <span style={{ fontSize: '0.9rem' }}>{c.content}</span>
+                <span style={{ fontSize: '0.9rem', lineHeight: 1.4 }}>{c.content}</span>
               </div>
             </div>
           ))}
           {user && (
-            <form onSubmit={submitComment} style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <form onSubmit={submitComment} style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
               <input
                 className="input"
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
                 placeholder="Escreva um comentário..."
-                style={{ flex: 1, padding: '0.5rem 0.75rem', fontSize: '0.9rem' }}
+                style={{ flex: 1, padding: '0.6rem 0.85rem', fontSize: '0.9rem' }}
               />
-              <button type="submit" className="btn btn-primary" disabled={loadingComment} style={{ padding: '0.5rem 1rem' }}>
+              <button type="submit" className="btn btn-primary" disabled={loadingComment} style={{ padding: '0.6rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {loadingComment ? '...' : '→'}
               </button>
             </form>
@@ -192,17 +192,17 @@ function ActionBtn({ icon, count, onClick, active, label }) {
   return (
     <button
       onClick={onClick}
+      aria-label={label}
       style={{
-        display: 'flex', alignItems: 'center', gap: '0.35rem',
+        display: 'flex', alignItems: 'center', gap: '0.45rem',
         color: active ? 'var(--pink)' : 'var(--text-secondary)',
         fontSize: '0.9rem', background: 'none', border: 'none',
-        cursor: 'pointer', padding: '0.25rem 0.5rem',
-        borderRadius: 'var(--radius-sm)', transition: 'var(--transition)',
+        cursor: 'pointer', padding: '0.4rem 0.5rem', borderRadius: 'var(--radius-sm)',
+        transition: 'background 0.2s'
       }}
-      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-      onMouseLeave={e => e.currentTarget.style.background = 'none'}
     >
-      {icon} <span>{count || 0}</span>
+      <span>{icon}</span>
+      <span style={{ fontWeight: 600 }}>{count}</span>
     </button>
   );
 }

@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 
 export default function Feed() {
   const { user } = useAuth();
-  const { posts, loading, hasMore, fetchPosts, refresh, updatePost, removePost, prependPost } = useFeed('feed');
+  const { posts, loading, hasMore, fetchPosts, updatePost, removePost, prependPost } = useFeed('feed');
   const [postText, setPostText] = useState('');
   const [category, setCategory] = useState('geral');
   const [posting, setPosting] = useState(false);
@@ -45,12 +45,12 @@ export default function Feed() {
   };
 
   return (
-    <div style={{ maxWidth: 680, margin: '0 auto', padding: '1rem' }}>
+    <div style={{ maxWidth: 680, margin: '0 auto', padding: '1.5rem 1rem' }}>
       {/* Create Post */}
       {user && (
-        <div className="card" style={{ marginBottom: '1rem' }}>
+        <div className="card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
           <form onSubmit={handlePost}>
-            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
               <div className="avatar avatar-md" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-hover)', fontSize: '1.2rem', flexShrink: 0 }}>
                 {user.avatar_url ? <img src={user.avatar_url} alt="" className="avatar avatar-md" /> : '👤'}
               </div>
@@ -60,27 +60,27 @@ export default function Feed() {
                 onChange={e => setPostText(e.target.value)}
                 placeholder={`O que você está vivendo, ${user.display_name?.split(' ')[0]}? 🌟`}
                 rows={3}
-                style={{ resize: 'none', flex: 1 }}
+                style={{ resize: 'none', flex: 1, padding: '0.75rem' }}
               />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
               <select
                 className="input"
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                style={{ width: 'auto', padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}
+                style={{ width: 'auto', padding: '0.5rem 1rem', fontSize: '0.85rem' }}
               >
                 <option value="geral">🌐 Geral</option>
                 <option value="solo">🧘 Solo</option>
                 <option value="a_dois">💑 A Dois</option>
                 <option value="turma">🎉 Turma</option>
               </select>
-              <label style={{ cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+              <label style={{ cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                 📷 {mediaFile ? mediaFile.name.slice(0, 20) + '...' : 'Foto/Vídeo'}
                 <input type="file" accept="image/*,video/*" style={{ display: 'none' }}
                   onChange={e => setMediaFile(e.target.files[0])} />
               </label>
-              <button type="submit" className="btn btn-primary" disabled={posting || !postText.trim()} style={{ marginLeft: 'auto' }}>
+              <button type="submit" className="btn btn-primary" disabled={posting || !postText.trim()} style={{ marginLeft: 'auto', padding: '0.5rem 1.25rem' }}>
                 {posting ? '...' : 'Publicar 🚀'}
               </button>
             </div>
@@ -93,17 +93,20 @@ export default function Feed() {
         dataLength={posts.length}
         next={() => fetchPosts(false)}
         hasMore={hasMore}
-        loader={<div style={{ textAlign: 'center', padding: '1rem' }}><span className="spinner" /></div>}
-        endMessage={<p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '1rem' }}>Você chegou ao fim do feed! 🎉</p>}
+        loader={<div style={{ textAlign: 'center', padding: '1.5rem' }}><span className="spinner" /></div>}
+        endMessage={<p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '1.5rem' }}>Você chegou ao fim do feed! 🎉</p>}
       >
-        {posts.map(post => (
-          <PostCard
-            key={post.id}
-            post={post}
-            onUpdate={updatePost}
-            onDelete={removePost}
-          />
-        ))}
+        {/* Container Flex adicionado para desgrudar os PostCards com gap automático */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {posts.map(post => (
+            <PostCard
+              key={post.id}
+              post={post}
+              onUpdate={updatePost}
+              onDelete={removePost}
+            />
+          ))}
+        </div>
       </InfiniteScroll>
 
       {!loading && posts.length === 0 && (

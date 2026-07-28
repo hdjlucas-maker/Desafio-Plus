@@ -88,7 +88,7 @@ const Register = () => {
       setGError('Falha ao carregar Google. Verifique sua conexão.');
     };
     document.head.appendChild(script);
-  }, []);
+  } );
 
   const handleChange = (e) => {
     const { name, value } = e.target;

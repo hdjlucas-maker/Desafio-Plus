@@ -12,25 +12,27 @@
   background-image:
     radial-gradient(ellipse at 20% 50%, rgba(120, 40, 200, 0.15) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(255, 60, 120, 0.1) 0%, transparent 50%);
-  padding: 20px;
+  padding: 24px; /* Aumentado de 20px para 24px */
 }
 
 .auth-card {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
-  padding: 40px 36px;
+  padding: 44px 36px; /* Aumentado o respiro superior para 44px */
   width: 100%;
   max-width: 420px;
   backdrop-filter: blur(20px);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Logo */
 .auth-logo {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px; /* Mais espaço abaixo do logotipo */
 }
 
 .logo-text {
@@ -53,25 +55,25 @@
   font-weight: 700;
   color: #fff;
   text-align: center;
-  margin: 0 0 8px;
+  margin: 0 0 10px; /* Aumentado de 8px para 10px */
 }
 
 .auth-subtitle {
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.5);
   text-align: center;
-  margin: 0 0 24px;
+  margin: 0 0 28px; /* Aumentado de 24px para 28px para desgrudar do primeiro input */
 }
 
 /* Alertas */
 .alert {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: 10px; /* Aumentado de 8px para 10px */
+  padding: 14px 18px; /* Mais área interna no aviso */
   border-radius: 10px;
   font-size: 0.875rem;
-  margin-bottom: 16px;
+  margin-bottom: 20px; /* Aumentado de 16px para 20px */
   animation: slideIn 0.3s ease;
 }
 
@@ -94,7 +96,7 @@
 
 /* Formulário */
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px; /* Aumentado de 16px para 20px para afastar as caixas de texto */
 }
 
 .form-label {
@@ -102,12 +104,12 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 6px;
+  margin-bottom: 8px; /* Aumentado de 6px para 8px para afastar da borda superior do input */
 }
 
 .form-input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 14px 16px; /* Aumentado para dar mais preenchimento interno */
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
@@ -132,13 +134,13 @@
   display: block;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.35);
-  margin-top: 4px;
+  margin-top: 6px; /* Mais espaço para a dica */
 }
 
 .form-forgot {
   text-align: right;
-  margin-bottom: 16px;
-  margin-top: -8px;
+  margin-bottom: 20px; /* Aumentado de 16px para 20px */
+  margin-top: -10px;
 }
 
 /* Botões */
@@ -146,8 +148,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 13px 20px;
+  gap: 10px; /* Aumentado para afastar ícones/emojis do texto */
+  padding: 14px 24px; /* Aumentado o padding do botão para dar mais respiro */
   border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -182,7 +184,7 @@
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #fff;
-  margin-bottom: 16px;
+  margin-bottom: 20px; /* Aumentado espaço abaixo do botão do google */
 }
 
 .btn-google:hover {
@@ -215,7 +217,7 @@
   border-top-color: #a855f7;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-  margin: 20px auto;
+  margin: 24px auto; /* Aumentada a margem vertical */
 }
 
 .google-loading {
@@ -231,8 +233,8 @@
 .auth-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 20px 0;
+  gap: 16px; /* Mais espaço lateral no texto "OU" */
+  margin: 24px 0; /* Aumentado de 20px para 24px */
   color: rgba(255, 255, 255, 0.25);
   font-size: 0.8rem;
 }
@@ -267,18 +269,18 @@
 /* Responsivo */
 @media (max-width: 480px) {
   .auth-page {
-    padding: 12px;
+    padding: 16px; /* Ganhou um pouco mais de respiro das bordas externas */
   }
   .auth-card {
-    padding: 28px 18px;
+    padding: 36px 24px; /* Aumentado o preenchimento de 18px para 24px para não espremer os botões */
   }
   .logo-text {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
   }
 }
 
 @media (max-width: 360px) {
   .auth-card {
-    padding: 22px 14px;
+    padding: 32px 18px; /* Mais respiro interno mesmo em telas minúsculas */
   }
 }

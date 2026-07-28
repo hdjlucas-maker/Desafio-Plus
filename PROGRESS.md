@@ -33,7 +33,6 @@
 | `frontend/src/components/Navbar.js` | Top bar (desktop) + Bottom nav (mobile) + avatar dropdown menu |
 | `frontend/src/components/PostCard.js` | Card de post com mídia, likes, comentários, delete |
 | `frontend/src/components/OnlineNotification.js` | Toast quando usuários ficam online (polling 30s) |
-| `frontend/src/components/BlockButton.js` | **NÃO USADO** — componente morto |
 
 ### Frontend — Páginas
 
@@ -89,14 +88,14 @@
 | `/api/feed` | routes/feed.js | OK | GET / (auth required), GET /explore (optional auth) — aceita limit+offset |
 | `/api/blocks` | routes/blockRoutes.js | OK | block/unblock, blocked list, privacy |
 | `/api/challenges` | routes/challenges.js | OK | daily, all, complete, history, ai-generate, tip |
-| `/api/games` | routes/games.js | ⚠️ | recordSession, leaderboard, history, stats — **tabelas game_sessions/game_leaderboard NÃO existem no db.js** |
-| `/api/chat` | routes/chat.js | ⚠️ | conversations, messages — **tabelas conversations/messages NÃO existem no db.js** |
+| `/api/games` | routes/games.js | OK | recordSession, leaderboard, history, stats — tabelas existem em db.js |
+| `/api/chat` | routes/chat.js | OK | conversations, messages — tabelas existem em db.js |
 | `/api/notifications` | routes/notifications.js | OK | list, unread-count, mark-all-read, mark-read |
 | `/api/search` | routes/search.js | OK | Busca users + posts |
 | `/api/upload` | routes/upload.js | OK | Upload local via multer → `/uploads/filename.ext` |
-| `/api/reports` | routes/reports.js | ⚠️ | **Tabela reports NÃO existe no db.js** |
-| `/api/presence` | routes/presence.js | ⚠️ | **NÃO MONTADO** — código morto em server.js (após return) |
-| `/api/suggestions` | routes/suggestions.js | ⚠️ | **NÃO MONTADO** — código morto em server.js (após return) |
+| `/api/reports` | routes/reports.js | OK | tabela reports existe em db.js, rota inline em worker.js |
+| `/api/presence` | routes/presence.js | OK | heartbeat, online, nearby — tabela user_presence em db.js, rotas inline em worker.js |
+| `/api/suggestions` | routes/suggestions.js | OK | nearby, online — rotas inline em worker.js |
 
 ### Backend — Controllers
 
@@ -109,7 +108,7 @@
 | controllers/challengesController.js | Daily, all, complete, AI generate, tips | Funcional — 48 desafios + 15 badges populados |
 | controllers/chatController.js | Conversations, messages | OK — tabelas criadas na sessão anterior |
 | controllers/notificationsController.js | List, unread, mark read | OK |
-| controllers/blockController.js | — | **CÓDIGO MORTO** — usa padrão D1, nunca importado |
+| controllers/blockController.js | — | **REMOVIDO** — código morto, arquivo eliminado |
 
 ### Backend — Models
 
@@ -129,6 +128,7 @@
 2. ~~**Tabela challenges vazia**~~ **RESOLVIDO** — 48 desafios populados via seed.js + wrangler d1 execute
 3. ~~**Tabela badges vazia**~~ **RESOLVIDO** — 15 badges populados via seed.js + wrangler d1 execute
 20. ~~**Explore feed retornava 0 posts**~~ **CORRIGIDO** — argumentos invertidos no `getExplorePosts()` do worker.js
+21. ~~**Presence nearby usava display_name para filtrar estado**~~ **CORRIGIDO** — `/api/presence/nearby` agora usa tabela `user_presence.state`
 
 ### Médios
 4. **Google OAuth não configurado**: `.env` tem `GOOGLE_CLIENT_ID=` e `GOOGLE_CLIENT_SECRET=` vazios. Login.js mostra "em breve". Register.js redireciona para backend (funciona se configurado).
@@ -138,8 +138,8 @@
 8. **R2 storage configurado mas NÃO habilitado na conta Cloudflare** — precisa habilitar R2 no Dashboard antes de usar uploads no Workers. Uploads locais continuam funcionando.
 9. ~~**2 jogos não implementados**: Caça-Palavras e Damas~~ **CORRIGIDO** — ambos implementados em Games.js.
 10. **Game invite no Discover é stub**: `alert('Funcionalidade em desenvolvimento')`.
-11. **BlockButton.js nunca é importado** — componente morto.
-12. **Profile.js**: variável `tab` declarada mas nunca usada no render.
+11. ~~**BlockButton.js nunca é importado**~~ **REMOVIDO** — arquivo eliminado, código morto removido.
+12. ~~**Profile.js**: variável `tab` declarada mas nunca usada no render~~ **REMOVIDO** — variável não utilizada eliminada.
 17. ~~**PostCard media URL relativo**~~ **CORRIGIDO** — `resolveMediaUrl()` prefixa com API base.
 18. ~~**Chat API desalinhada**~~ **CORRIGIDO** — frontend `chatAPI` agora casa com backend routes.
 19. ~~**Discover chat com userId**~~ **CORRIGIDO** — agora usa `username` e Chat.js auto-abre conversa.
@@ -147,7 +147,7 @@
 ### Baixos
 13. **Login.js link "Esqueci senha"** → rota `/forgot-password` não existe.
 14. **Share count não incrementa** — botão copia link mas não atualiza `shares_count`.
-15. **Sem ranking page no frontend** — endpoint backend `GET /api/users/ranking` existe mas sem página.
+15. ~~**Sem ranking page no frontend**~~ **CORRIGIDO** — página /ranking criada com abas Pontos/XP/Streak
 16. **Sem sistema de temporadas** — tabelas seasons/season_rankings não criadas, sem controller.
 
 ---

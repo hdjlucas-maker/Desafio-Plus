@@ -17,7 +17,6 @@ export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState('posts');
   const [following, setFollowing] = useState(false);
 
   useEffect(() => {

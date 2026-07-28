@@ -305,25 +305,34 @@ app.post('/api/presence/heartbeat', honoMiddleware(requireAuth), toHono(async (r
 app.get('/api/presence/online', honoMiddleware(requireAuth), toHono(async (req, res) => {
   const online = await queryAll(
     `SELECT u.id, u.username, u.display_name, u.avatar_url, p.last_seen, p.state
-     FROM user_presence p JOIN users u ON p.user_id = u.id
-     WHERE p.is_online = 1 AND datetime(p.last_seen) > datetime('now', '-5 minutes')
-     ORDER BY p.last_seen DESC`
-    , [], req.d1
+     FROM user_presence p
+     JOIN users u ON u.id = p.user_id
+     WHERE p.is_online = 1
+       AND datetime(p.last_seen) > datetime('now', '-60 seconds')
+       AND u.id != ?
+       AND u.is_banned = 0
+     ORDER BY p.last_seen DESC`,
+    [req.user.id], req.d1
   );
   res.json(online);
 }));
 
 app.get('/api/presence/nearby', honoMiddleware(requireAuth), toHono(async (req, res) => {
-  const me = await queryOne('SELECT display_name FROM users WHERE id = ?', [req.user.id], req.d1);
-  const myState = me?.display_name?.split(' - ')[1] || '';
+  const me = await queryOne('SELECT state FROM user_presence WHERE user_id = ?', [req.user.id], req.d1);
+  const myState = me?.state || '';
   if (!myState) return res.json([]);
 
   const nearby = await queryAll(
     `SELECT u.id, u.username, u.display_name, u.avatar_url, p.last_seen, p.state
-     FROM user_presence p JOIN users u ON p.user_id = u.id
-     WHERE p.is_online = 1 AND u.display_name LIKE ? AND u.id != ?
-     ORDER BY p.last_seen DESC LIMIT 20`,
-    [`%${myState}%`, req.user.id], req.d1
+     FROM user_presence p
+     JOIN users u ON u.id = p.user_id
+     WHERE p.is_online = 1
+       AND p.state = ?
+       AND u.id != ?
+       AND u.is_banned = 0
+     ORDER BY p.last_seen DESC
+     LIMIT 20`,
+    [myState, req.user.id], req.d1
   );
   res.json(nearby);
 }));

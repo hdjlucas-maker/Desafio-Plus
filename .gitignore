@@ -1,5 +1,7 @@
 .env
 node_modules
 backend/.env
+backend/desafio-plus.db*
+backend/*.db*
 frontend/.env
 frontend/.env.production

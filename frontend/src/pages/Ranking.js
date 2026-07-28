@@ -16,20 +16,19 @@ export default function Ranking() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const loadRanking = async () => {
+      setLoading(true);
+      try {
+        const { data } = await usersAPI.getRanking({ mode, limit: 50 });
+        setRows(data);
+      } catch (err) {
+        toast.error('Não foi possível carregar o ranking.');
+      } finally {
+        setLoading(false);
+      }
+    };
     loadRanking();
   }, [mode]);
-
-  const loadRanking = async () => {
-    setLoading(true);
-    try {
-      const { data } = await usersAPI.getRanking({ mode, limit: 50 });
-      setRows(data);
-    } catch (err) {
-      toast.error('Não foi possível carregar o ranking.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const setMode = (key) => {
     setSearchParams(key === 'points' ? {} : { mode: key });

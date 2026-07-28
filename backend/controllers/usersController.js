@@ -33,6 +33,7 @@ async function updateProfile(req, res) {
     const user = await userModel.update(req.user.id, { display_name, bio, privacy }, req.d1);
     res.json(user);
   } catch (err) {
+    console.error('[UPDATE_PROFILE_ERROR]', err);
     res.status(500).json({ error: 'Erro ao atualizar perfil' });
   }
 }

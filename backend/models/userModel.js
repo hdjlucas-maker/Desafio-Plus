@@ -35,10 +35,10 @@ async function create({ id, email, username, display_name, password_hash = null,
 async function update(id, fields, d1 = null) {
   const allowed = ['display_name', 'bio', 'avatar_url', 'privacy'];
   const updates = Object.entries(fields)
-    .filter(([k]) => allowed.includes(k))
+    .filter(([k, v]) => allowed.includes(k) && v !== undefined && v !== null)
     .map(([k]) => `${k} = ?`);
   const values = Object.entries(fields)
-    .filter(([k]) => allowed.includes(k))
+    .filter(([k, v]) => allowed.includes(k) && v !== undefined && v !== null)
     .map(([, v]) => v);
 
   if (!updates.length) return findById(id, d1);

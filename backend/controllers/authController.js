@@ -23,21 +23,29 @@ const {
   verifyRefreshToken,
 } = require('../middleware/auth');
 
-// Google OAuth — opcional: lazy init para respeitar globalThis.__CF_ENV__ (Workers)
-let _googleClient = null;
-let _lastGcid = null;
-function getGoogleClient() {
-  const gCid = ((globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID || '').trim();
-  if (!gCid) return null;
-  if (_googleClient && _lastGcid === gCid) return _googleClient;
-  try {
-    const { OAuth2Client } = require('google-auth-library');
-    _googleClient = new OAuth2Client(gCid);
-    _lastGcid = gCid;
-    return _googleClient;
-  } catch {
-    return null;
+// Google OAuth — verificação via fetch ao tokeninfo do Google.
+// IMPORTANTE: não usamos mais 'google-auth-library' aqui porque ela depende de
+// APIs do Node (https/crypto) que não funcionam de forma confiável dentro do
+// Cloudflare Workers. Essa versão usa fetch puro, que funciona igual local e no Workers.
+function getGoogleClientId() {
+  return (globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID || null;
+}
+
+async function verifyGoogleIdToken(idToken, expectedAudience) {
+  const res = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`);
+  if (!res.ok) {
+    throw new Error('Token do Google inválido ou expirado');
   }
+  const payload = await res.json();
+
+  if (payload.aud !== expectedAudience) {
+    throw new Error('Token do Google não corresponde a este app (audience mismatch)');
+  }
+  if (payload.email_verified !== 'true' && payload.email_verified !== true) {
+    throw new Error('E-mail do Google não verificado');
+  }
+
+  return payload;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -87,12 +95,16 @@ async function notifyAllUsersNewMember(newUser) {
 async function register(req, res) {
   try {
     let { email, password, username, display_name } = req.body;
-    email = (email || '').trim().toLowerCase();
 
     // Validação
     if (!email || !password || !username || !display_name) {
       return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
     }
+
+    // Normaliza (evita e-mail/username salvos com maiúsculas divergindo do login)
+    email = String(email).trim().toLowerCase();
+    username = String(username).trim().toLowerCase();
+    display_name = String(display_name).trim();
     if (password.length < 8) {
       return res.status(400).json({ error: 'Senha deve ter pelo menos 8 caracteres' });
     }
@@ -136,12 +148,12 @@ async function register(req, res) {
 async function login(req, res) {
   try {
     let { email, password } = req.body;
-    email = (email || '').trim().toLowerCase();
 
     if (!email || !password) {
       return res.status(400).json({ error: 'E-mail e senha são obrigatórios' });
     }
 
+    email = String(email).trim().toLowerCase();
     const user = await userModel.findByEmail(email);
     if (!user || !user.password_hash) {
       return res.status(401).json({ error: 'Credenciais inválidas' });
@@ -174,20 +186,17 @@ async function login(req, res) {
 
 async function googleAuth(req, res) {
   try {
-    const gc = getGoogleClient();
-    if (!gc) {
+    const gCid = getGoogleClientId();
+    if (!gCid) {
       return res.status(501).json({ error: 'Login com Google não configurado neste servidor.' });
     }
 
     const { id_token } = req.body;
     if (!id_token) return res.status(400).json({ error: 'Token Google necessário' });
 
-    const ticket = await gc.verifyIdToken({
-      idToken: id_token,
-      audience: (((globalThis.__CF_ENV__ && globalThis.__CF_ENV__.GOOGLE_CLIENT_ID) || process.env.GOOGLE_CLIENT_ID) || '').trim(),
-    });
-    const payload = ticket.getPayload();
-    const { sub: googleId, email, name, picture } = payload;
+    const payload = await verifyGoogleIdToken(id_token, gCid);
+    const { sub: googleId, name, picture } = payload;
+    const email = String(payload.email).trim().toLowerCase();
 
     let isNew = false;
     let user = await userModel.findByGoogleId(googleId);
@@ -282,8 +291,7 @@ async function logout(req, res) {
 
 async function forgotPassword(req, res) {
   try {
-    let { email } = req.body;
-    email = (email || '').trim().toLowerCase();
+    const { email } = req.body;
     const user = await userModel.findByEmail(email);
     if (user) {
       const token = crypto.randomBytes(32).toString('hex');

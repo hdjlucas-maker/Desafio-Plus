@@ -24,6 +24,7 @@
   max-width: 420px;
   backdrop-filter: blur(20px);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
 }
 
 /* Logo */
@@ -265,7 +266,19 @@
 
 /* Responsivo */
 @media (max-width: 480px) {
+  .auth-page {
+    padding: 12px;
+  }
   .auth-card {
-    padding: 28px 20px;
+    padding: 28px 18px;
+  }
+  .logo-text {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .auth-card {
+    padding: 22px 14px;
   }
 }

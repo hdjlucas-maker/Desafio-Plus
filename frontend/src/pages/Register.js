@@ -63,15 +63,22 @@ const Register = () => {
             }
           },
         });
-        const containerWidth = googleContainerRef.current?.offsetWidth || 300;
-        window.google.accounts.id.renderButton(googleContainerRef.current, {
-          theme: 'outline',
-          size: 'large',
-          width: Math.min(containerWidth, 400),
-          text: 'signup_with',
-          shape: 'rectangular',
-          locale: 'pt_BR',
-        });
+        const renderGoogleButton = () => {
+          const containerWidth = googleContainerRef.current?.offsetWidth || 300;
+          googleContainerRef.current.innerHTML = '';
+          window.google.accounts.id.renderButton(googleContainerRef.current, {
+            theme: 'outline',
+            size: 'large',
+            width: Math.min(containerWidth, 400),
+            text: 'signup_with',
+            shape: 'rectangular',
+            locale: 'pt_BR',
+          });
+        };
+
+        requestAnimationFrame(renderGoogleButton);
+        window.addEventListener('resize', renderGoogleButton);
+        window.addEventListener('orientationchange', renderGoogleButton);
       } catch (e) {
         setGError('Google indisponível no momento. Tente de novo.');
         console.error('Google init error:', e);

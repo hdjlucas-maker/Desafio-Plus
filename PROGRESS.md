@@ -191,24 +191,22 @@
 ---
 
 ## Última sessão
-- Data: 26/07/2026
-- IA usada: opencode (big-pickle)
-- O que foi feito (Deploy + pendências):
-  1. **Migração Express→Hono** — Express não funciona no Workers (streams indisponíveis). Criado `worker.js` com Hono + adapter Express→Hono.
-  2. **db.js dual-mode** — better-sqlite3 (local) / D1 (Workers via `globalThis.__CF_ENV__`).
-  3. **auth.js dinâmico** — `getJwtSecret()` em runtime.
-  4. **Backend deployado** → `https://desafio-plus-api.hdjlucas.workers.dev`
-  5. **Frontend deployado** → `https://6c2a3df4.desafio-plus.pages.dev`
-  6. **16/16 endpoints testados** em produção (register, login, me, feed, explore, post, like, comment, chat, follow, profile, challenges, game session, stats, notifications, presence, search, ranking)
-  7. **Bug explore feed corrigido** — argumentos `getExplorePosts()` invertidos no worker.js
-  8. **Dados de teste limpos** — removidos testuser5/nickteste, mantidos alice/bob com posts, likes, comments, follows, games
-  9. **Pages env var setada** — `REACT_APP_API_URL` como secret no Pages
-  10. **worker-adapter.js marcado como deprecated**
-  11. **PROGRESS.md atualizado** com estado final
-- Arquivos criados: `backend/worker.js`, `frontend/.env.production`
-- Arquivos alterados: `wrangler.toml`, `backend/config/db.js`, `backend/middleware/auth.js`, `backend/server.js`, `backend/routes/upload.js`, `backend/controllers/authController.js`, `backend/package.json`, `frontend/src/pages/Games.js`
-- **Pendência restante**: R2 não habilitado na conta Cloudflare (precisa Dashboard manual)
-- Próximo passo: **habilitar R2 para uploads** ou **testar jogos de ponta a ponta** ou **criar ranking page**
+- Data: 28/07/2026
+- IA usada: Kilo
+- O que foi feito (Limpeza + Correções + Ranking):
+   1. **Código morto eliminado** — removidos `backend/controllers/blockController.js`, `backend/worker-adapter.js` e `frontend/src/components/BlockButton.js`
+   2. **Bug presence nearby corrigido** — `/api/presence/nearby` no `worker.js` usava `display_name` para filtrar estado; agora usa tabela `user_presence.state`
+   3. **Página Ranking criada** — `/ranking` com abas Pontos/XP/Streak, integrada na Navbar e bottom nav
+   4. **API client atualizado** — `usersAPI.getRanking` adicionado em `frontend/src/services/api.js`
+   5. **Profile.js limpo** — removida variável `tab` declarada mas não usada
+   6. **3+ jogos testados E2E** — Jogo da Velha, Quiz e Memória registram sessão e atualizam pontos no perfil
+   7. **Pontos/XP/nível/streak verificados** — `addXP` e `updateStreak` calculando corretamente
+   8. **PROGRESS.md atualizado** — rotas presence/suggestions/reports/games/chat corrigidas de ⚠️ para OK
+   9. **.gitignore atualizado** — adicionado `backend/desafio-plus.db*` para não commitar banco local
+- Arquivos criados: `frontend/src/pages/Ranking.js`
+- Arquivos alterados: `PROGRESS.md`, `backend/worker.js`, `frontend/src/pages/Profile.js`, `frontend/src/pages/Ranking.js`, `frontend/src/App.js`, `frontend/src/components/Navbar.js`, `frontend/src/services/api.js`, `.gitignore`
+- **Pendências restantes**: R2 não habilitado na conta Cloudflare; Google OAuth não configurado (.env vazia)
+- Próximo passo: **habilitar R2** ou **configurar Google OAuth** para fechar checklist de produção
 
 ---
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Auth.css';
@@ -10,10 +10,6 @@ const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    document.head.querySelector('script[src*="accounts.google.com"]')?.remove();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

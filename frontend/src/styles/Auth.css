@@ -1,5 +1,5 @@
 /* ============================================================
-   Auth.css — Estilos para Login, Register e GoogleCallback
+   Auth.css — Estilos para Login e Register
    Tema: Dark mode com gradientes roxo/rosa/laranja
    ============================================================ */
 
@@ -179,19 +179,6 @@
   cursor: not-allowed;
 }
 
-.btn-google {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #fff;
-  margin-bottom: 20px; /* Aumentado espaço abaixo do botão do google */
-}
-
-.btn-google:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
 .btn-loading {
   display: flex;
   align-items: center;
@@ -218,11 +205,6 @@
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 24px auto; /* Aumentada a margem vertical */
-}
-
-.google-loading {
-  display: flex;
-  justify-content: center;
 }
 
 @keyframes spin {
